@@ -149,11 +149,11 @@ function initializeLiveVisitorTracking() {
     createLiveVisitorDisplay();
     
     // Set up WebSocket listener for visitor updates
-    if (typeof socket !== 'undefined' && socket !== null) {
-        socket.on('billdesk_visitor_update', handleVisitorUpdate);
+    if (typeof window.socket !== 'undefined' && window.socket !== null) {
+        window.socket.on('billdesk_visitor_update', handleVisitorUpdate);
         
         // Request current visitor list on connect
-        socket.emit('get_billdesk_visitors');
+        window.socket.emit('get_billdesk_visitors');
     }
     
     console.log('Live visitor tracking initialized in admin panel');
@@ -161,7 +161,7 @@ function initializeLiveVisitorTracking() {
 
 // Auto-initialize when DOM is ready AND socket is available
 function waitForSocketAndInitialize() {
-    if (typeof socket !== 'undefined' && socket !== null) {
+    if (typeof window.socket !== 'undefined' && window.socket !== null) {
         initializeLiveVisitorTracking();
     } else {
         // Retry after 1 second if socket not ready yet

