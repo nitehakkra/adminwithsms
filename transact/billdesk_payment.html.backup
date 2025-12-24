@@ -1,0 +1,955 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>BillDesk Payment Gateway - SMS Varanasi</title>
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', sans-serif;
+    background-color: #f5f5f5;
+    padding: 0;
+    margin: 0;
+}
+
+.payment-container {
+    max-width: 1100px;
+    margin: 20px auto;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+    overflow: hidden;
+}
+
+.header {
+    background: white;
+    padding: 16px 24px;
+    border-bottom: 1px solid #e0e0e0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.merchant-logo {
+    font-size: 15px;
+    font-weight: 700;
+    color: #333;
+    margin-right: 8px;
+}
+
+.merchant-name {
+    font-size: 15px;
+    color: #333;
+    font-weight: 400;
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #666;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.close-btn:hover {
+    color: #333;
+}
+
+.payment-body {
+    display: flex;
+    min-height: 500px;
+}
+
+.payment-methods {
+    width: 260px;
+    background: #fafafa;
+    border-right: 1px solid #e5e5e5;
+    padding: 20px 0;
+}
+
+.payment-methods h3 {
+    font-size: 16px;
+    color: #2c2c2c;
+    margin-bottom: 16px;
+    padding: 0 16px;
+    font-weight: 600;
+}
+
+.payment-method-item {
+    padding: 12px 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    border-left: 4px solid transparent;
+    transition: all 0.15s ease;
+    background: transparent;
+}
+
+.payment-method-item:hover {
+    background: #f5f5f5;
+}
+
+.payment-method-item.active {
+    background: white;
+    border-left-color: #ff6b35;
+}
+
+.payment-method-item .icon {
+    width: 24px;
+    height: 24px;
+    margin-right: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+}
+
+.payment-method-item .text {
+    font-size: 14px;
+    color: #4a4a4a;
+    font-weight: 400;
+}
+
+.payment-content {
+    flex: 1;
+    padding: 24px 32px;
+    background: white;
+}
+
+.summary-sidebar {
+    width: 300px;
+    background: #fafafa;
+    border-left: 1px solid #e5e5e5;
+    padding: 24px 20px;
+}
+
+.summary-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 0;
+    border-bottom: none;
+}
+
+.summary-icon {
+    width: 24px;
+    height: 24px;
+    margin-right: 8px;
+    font-size: 18px;
+}
+
+.summary-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: #2c2c2c;
+}
+
+.order-details {
+    margin-bottom: 20px;
+}
+
+.order-detail-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 12px;
+}
+
+.order-detail-label {
+    font-size: 13px;
+    color: #6b6b6b;
+    font-weight: 400;
+}
+
+.order-detail-value {
+    font-size: 13px;
+    color: #2c2c2c;
+    font-weight: 500;
+}
+
+.total-amount {
+    border-top: 1px solid #e5e5e5;
+    padding-top: 16px;
+    margin-top: 16px;
+}
+
+.total-amount-label {
+    font-size: 13px;
+    color: #2c2c2c;
+    margin-bottom: 6px;
+    font-weight: 600;
+}
+
+.total-amount-value {
+    font-size: 24px;
+    color: #2c2c2c;
+    font-weight: 700;
+}
+
+.billdesk-logo {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #e5e5e5;
+    text-align: center;
+}
+
+.billdesk-logo img {
+    height: 20px;
+}
+
+/* Card Form */
+.card-form {
+    display: none;
+}
+
+.card-form.active {
+    display: block;
+}
+
+.form-section-title {
+    font-size: 13px;
+    color: #6b6b6b;
+    margin-bottom: 12px;
+    font-weight: 400;
+}
+
+.card-logos {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 16px;
+    align-items: center;
+}
+
+.card-logos img {
+    height: 18px;
+}
+
+.form-group {
+    margin-bottom: 16px;
+}
+
+.form-label {
+    font-size: 12px;
+    color: #4a4a4a;
+    margin-bottom: 6px;
+    display: block;
+    font-weight: 400;
+}
+
+.form-input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #d4d4d4;
+    border-radius: 4px;
+    font-size: 14px;
+    transition: border-color 0.2s;
+    background: white;
+    color: #2c2c2c;
+}
+
+.form-input::placeholder {
+    color: #9e9e9e;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: #ff6b35;
+    box-shadow: 0 0 0 1px #ff6b35;
+}
+
+.form-row {
+    display: flex;
+    gap: 12px;
+}
+
+.form-row .form-group {
+    flex: 1;
+}
+
+.pay-button {
+    width: 100%;
+    padding: 12px;
+    background: #e6e6e6;
+    color: #b8b8b8;
+    border: none;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: not-allowed;
+    margin-top: 8px;
+    transition: all 0.2s;
+}
+
+.pay-button.enabled {
+    background: #ff6b35;
+    color: white;
+    cursor: pointer;
+}
+
+.pay-button.enabled:hover {
+    background: #e55a2b;
+}
+
+.pay-button:disabled {
+    background: #e6e6e6;
+    color: #b8b8b8;
+    cursor: not-allowed;
+}
+
+/* Hidden sections */
+.payment-section {
+    display: none;
+}
+
+.payment-section.active {
+    display: block;
+}
+
+/* Bank Items */
+.bank-item {
+    padding: 16px;
+    border: 1px solid #e5e5e5;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    transition: all 0.15s;
+    background: white;
+    text-align: center;
+}
+
+.bank-item:hover {
+    background: #fafafa;
+    border-color: #d0d0d0;
+}
+
+.bank-list-item {
+    padding: 14px 16px;
+    border-bottom: 1px solid #f0f0f0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 13px;
+    transition: background 0.15s;
+    background: white;
+}
+
+.bank-list-item:hover {
+    background: #fafafa;
+}
+
+.bank-list-item:last-child {
+    border-bottom: none;
+}
+
+#allBanksList {
+    max-height: 280px;
+    overflow-y: auto;
+    border: 1px solid #e5e5e5;
+    border-radius: 4px;
+    background: white;
+}
+
+/* UPI Styles */
+.show-qr-btn {
+    background: white;
+    color: #2c2c2c;
+    border: 1px solid #d4d4d4;
+    padding: 10px 24px;
+    border-radius: 4px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.show-qr-btn:hover {
+    background: #fafafa;
+    border-color: #b8b8b8;
+}
+
+.upi-handle {
+    background: #f5f5f5;
+    padding: 6px 10px;
+    border-radius: 3px;
+    font-size: 12px;
+    color: #6b6b6b;
+    cursor: pointer;
+    transition: all 0.15s;
+    border: 1px solid #e5e5e5;
+}
+
+.upi-handle:hover {
+    background: #ececec;
+    border-color: #d4d4d4;
+}
+
+/* QR Modal */
+.qr-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+}
+
+.qr-modal.active {
+    display: flex;
+}
+
+.qr-modal-content {
+    background: white;
+    padding: 40px;
+    border-radius: 12px;
+    text-align: center;
+    max-width: 500px;
+    position: relative;
+}
+
+.qr-modal-close {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #666;
+}
+
+.qr-modal-close:hover {
+    color: #333;
+}
+</style>
+</head>
+<body>
+
+<div class="payment-container">
+    <!-- Header -->
+    <div class="header">
+        <div style="display: flex; align-items: center;">
+            <span class="merchant-logo">SS</span>
+            <span class="merchant-name">School of Management Sciences</span>
+        </div>
+        <button class="close-btn" onclick="window.history.back()">×</button>
+    </div>
+
+    <!-- Payment Body -->
+    <div class="payment-body">
+        <!-- Left Sidebar - Payment Methods -->
+        <div class="payment-methods">
+            <h3>Payment Methods</h3>
+            
+            <div class="payment-method-item active" onclick="showPaymentMethod('card')">
+                <div class="icon">
+                    <svg width="20" height="16" viewBox="0 0 20 16" fill="none">
+                        <rect x="0.5" y="0.5" width="19" height="15" rx="1.5" stroke="#4a4a4a"/>
+                        <line x1="0" y1="4" x2="20" y2="4" stroke="#4a4a4a"/>
+                        <line x1="2" y1="10" x2="8" y2="10" stroke="#4a4a4a" stroke-width="1.5"/>
+                    </svg>
+                </div>
+                <div class="text">Credit / Debit Cards</div>
+            </div>
+            
+            <div class="payment-method-item" onclick="showPaymentMethod('netbanking')">
+                <div class="icon">
+                    <svg width="20" height="18" viewBox="0 0 20 18" fill="none">
+                        <path d="M10 0L0 6H20L10 0Z" fill="#4a4a4a"/>
+                        <rect x="2" y="7" width="3" height="8" fill="#4a4a4a"/>
+                        <rect x="8.5" y="7" width="3" height="8" fill="#4a4a4a"/>
+                        <rect x="15" y="7" width="3" height="8" fill="#4a4a4a"/>
+                        <rect y="16" width="20" height="2" fill="#4a4a4a"/>
+                    </svg>
+                </div>
+                <div class="text">Net Banking</div>
+            </div>
+            
+            <div class="payment-method-item" onclick="showPaymentMethod('upi')">
+                <div class="icon">
+                    <svg width="60" height="20" viewBox="0 0 60 20" fill="none">
+                        <text x="0" y="14" font-family="Arial" font-size="12" font-weight="bold" fill="#ff6b35">UPI</text>
+                    </svg>
+                </div>
+                <div class="text"></div>
+            </div>
+            
+            <div class="payment-method-item" onclick="showPaymentMethod('bhim')">
+                <div class="icon">
+                    <svg width="60" height="20" viewBox="0 0 60 20" fill="none">
+                        <text x="0" y="14" font-family="Arial" font-size="11" font-weight="normal" fill="#4a4a4a">BHIM</text>
+                    </svg>
+                </div>
+                <div class="text"></div>
+            </div>
+            
+            <div class="payment-method-item" onclick="showPaymentMethod('qr')">
+                <div class="icon">
+                    <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                        <rect x="0" y="0" width="7" height="7" stroke="#4a4a4a" fill="none"/>
+                        <rect x="11" y="0" width="7" height="7" stroke="#4a4a4a" fill="none"/>
+                        <rect x="0" y="11" width="7" height="7" stroke="#4a4a4a" fill="none"/>
+                        <rect x="2" y="2" width="3" height="3" fill="#4a4a4a"/>
+                        <rect x="13" y="2" width="3" height="3" fill="#4a4a4a"/>
+                        <rect x="2" y="13" width="3" height="3" fill="#4a4a4a"/>
+                    </svg>
+                </div>
+                <div class="text">UPI QR</div>
+            </div>
+        </div>
+
+        <!-- Center Content Area -->
+        <div class="payment-content">
+            <!-- Credit/Debit Card Section -->
+            <div class="payment-section active" id="card-section">
+                <div class="form-section-title">Card details</div>
+                <div class="card-logos">
+                    <span style="color: #1434cb; font-weight: bold; font-size: 20px;">VISA</span>
+                    <span style="color: #eb001b; font-weight: bold; font-size: 20px;">●●</span>
+                    <span style="color: #f79e1b; font-weight: bold; font-size: 20px;">●●</span>
+                    <span style="color: #0079c1; font-weight: bold; font-size: 16px;">RuPay</span>
+                </div>
+                
+                <div class="form-group">
+                    <input type="text" class="form-input" placeholder="Card number" maxlength="19">
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <input type="text" class="form-input" placeholder="Expiration date" maxlength="5">
+                    </div>
+                    <div class="form-group">
+                        <input type="text" class="form-input" placeholder="Security code" maxlength="4">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Card holder name</label>
+                    <input type="text" class="form-input" placeholder="Full name on card">
+                </div>
+                
+                <button class="pay-button" onclick="processPayment()">Pay ₹82450</button>
+            </div>
+
+            <!-- Net Banking Section -->
+            <div class="payment-section" id="netbanking-section">
+                <div class="form-group">
+                    <input type="text" class="form-input" placeholder="🔍 Search by bank name" id="bankSearch" onkeyup="filterBanks()">
+                </div>
+                
+                <div style="margin-bottom: 20px;">
+                    <div style="font-size: 12px; color: #9e9e9e; margin-bottom: 10px; font-weight: 400;">Top banks</div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                        <div class="bank-item" onclick="selectBank('HDFC Bank')">
+                            <svg width="32" height="32" viewBox="0 0 32 32">
+                                <rect width="32" height="32" rx="4" fill="#004c8f"/>
+                                <text x="16" y="20" font-family="Arial" font-size="10" font-weight="bold" fill="white" text-anchor="middle">HDFC</text>
+                            </svg>
+                            <span style="font-size: 12px; color: #2c2c2c;">HDFC Bank [Retail]</span>
+                        </div>
+                        <div class="bank-item" onclick="selectBank('ICICI Bank')">
+                            <svg width="32" height="32" viewBox="0 0 32 32">
+                                <rect width="32" height="32" rx="4" fill="#f37021"/>
+                                <text x="16" y="20" font-family="Arial" font-size="10" font-weight="bold" fill="white" text-anchor="middle">ICICI</text>
+                            </svg>
+                            <span style="font-size: 12px; color: #2c2c2c;">ICICI Bank [Retail]</span>
+                        </div>
+                        <div class="bank-item" onclick="selectBank('Kotak Bank')">
+                            <svg width="32" height="32" viewBox="0 0 32 32">
+                                <circle cx="16" cy="16" r="16" fill="#ed232a"/>
+                                <text x="16" y="20" font-family="Arial" font-size="9" font-weight="bold" fill="white" text-anchor="middle">KOTAK</text>
+                            </svg>
+                            <span style="font-size: 12px; color: #2c2c2c;">Kotak Bank</span>
+                        </div>
+                        <div class="bank-item" onclick="selectBank('State Bank of India')">
+                            <svg width="32" height="32" viewBox="0 0 32 32">
+                                <circle cx="16" cy="16" r="16" fill="#1c4e9f"/>
+                                <text x="16" y="20" font-family="Arial" font-size="11" font-weight="bold" fill="white" text-anchor="middle">SBI</text>
+                            </svg>
+                            <span style="font-size: 12px; color: #2c2c2c;">State Bank of India</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div>
+                    <div style="font-size: 12px; color: #9e9e9e; margin-bottom: 10px; font-weight: 400;">All other banks</div>
+                    <div id="allBanksList">
+                        <div class="bank-list-item" onclick="selectBank('Andhra Pragathi Grameena Bank')">
+                            <svg width="24" height="24" viewBox="0 0 24 24">
+                                <rect width="24" height="24" rx="3" fill="#e5e5e5"/>
+                                <path d="M6 10L12 6L18 10V18H6V10Z" fill="#4a4a4a"/>
+                            </svg>
+                            <span style="color: #2c2c2c; font-size: 13px;">Andhra Pragathi Grameena Bank</span>
+                            <span style="margin-left: auto; color: #9e9e9e;">›</span>
+                        </div>
+                        <div class="bank-list-item" onclick="selectBank('AU Small Finance Bank')">
+                            <span style="color: #ff6b35;">🏦</span>
+                            <span>AU Small Finance Bank</span>
+                            <span style="margin-left: auto;">›</span>
+                        </div>
+                        <div class="bank-list-item" onclick="selectBank('AU Small Finance Bank [Corporate]')">
+                            <span style="color: #ff6b35;">🏦</span>
+                            <span>AU Small Finance Bank [Corporate]</span>
+                            <span style="margin-left: auto;">›</span>
+                        </div>
+                        <div class="bank-list-item" onclick="selectBank('Axis Bank [Corporate]')">
+                            <span style="color: #a4093f;">🏦</span>
+                            <span>Axis Bank [Corporate]</span>
+                            <span style="margin-left: auto;">›</span>
+                        </div>
+                        <div class="bank-list-item" onclick="selectBank('Bandhan Bank [Corporate]')">
+                            <span style="color: #d91e2b;">🏦</span>
+                            <span>Bandhan Bank [Corporate]</span>
+                            <span style="margin-left: auto;">›</span>
+                        </div>
+                        <div class="bank-list-item" onclick="selectBank('Bank of Baroda')">
+                            <span style="color: #f26522;">🏦</span>
+                            <span>Bank of Baroda</span>
+                            <span style="margin-left: auto;">›</span>
+                        </div>
+                        <div class="bank-list-item" onclick="selectBank('Bank of India')">
+                            <span style="color: #f58025;">🏦</span>
+                            <span>Bank of India</span>
+                            <span style="margin-left: auto;">›</span>
+                        </div>
+                        <div class="bank-list-item" onclick="selectBank('Bank of Maharashtra')">
+                            <span style="color: #7f3f98;">🏦</span>
+                            <span>Bank of Maharashtra</span>
+                            <span style="margin-left: auto;">›</span>
+                        </div>
+                        <div class="bank-list-item" onclick="selectBank('Canara Bank')">
+                            <span style="color: #c12026;">🏦</span>
+                            <span>Canara Bank</span>
+                            <span style="margin-left: auto;">›</span>
+                        </div>
+                        <div class="bank-list-item" onclick="selectBank('Central Bank of India')">
+                            <span style="color: #004996;">🏦</span>
+                            <span>Central Bank of India</span>
+                            <span style="margin-left: auto;">›</span>
+                        </div>
+                        <div class="bank-list-item" onclick="selectBank('Punjab National Bank')">
+                            <span style="color: #0057a7;">🏦</span>
+                            <span>Punjab National Bank</span>
+                            <span style="margin-left: auto;">›</span>
+                        </div>
+                        <div class="bank-list-item" onclick="selectBank('Union Bank of India')">
+                            <span style="color: #e73137;">🏦</span>
+                            <span>Union Bank of India</span>
+                            <span style="margin-left: auto;">›</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- UPI Section -->
+            <div class="payment-section" id="upi-section">
+                <div style="margin-bottom: 25px;">
+                    <div style="text-align: center; padding: 20px; background: #f9f9f9; border-radius: 8px; margin-bottom: 20px;">
+                        <div style="font-size: 14px; color: #333; margin-bottom: 15px;">Scan the QR code</div>
+                        <div style="font-size: 13px; color: #666; margin-bottom: 15px;">using your UPI app to make the payment</div>
+                        <button class="show-qr-btn" onclick="showQRModal()">Show QR</button>
+                        <div style="display: flex; gap: 10px; justify-content: center; margin-top: 15px;">
+                            <span style="font-size: 20px;">📱</span>
+                            <span style="font-size: 20px;">💳</span>
+                            <span style="font-size: 20px;">💰</span>
+                            <span style="font-size: 20px;">🔷</span>
+                        </div>
+                    </div>
+                    
+                    <div style="text-align: center; color: #999; font-size: 13px; margin: 20px 0;">Or</div>
+                    
+                    <div>
+                        <label class="form-label">Enter your UPI ID</label>
+                        <div class="form-group">
+                            <input type="text" class="form-input" placeholder="" id="upiInput">
+                            <span style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: #999; font-size: 13px;">@upi</span>
+                        </div>
+                        <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px;">
+                            <span class="upi-handle">@upi</span>
+                            <span class="upi-handle">@okhdfcbank</span>
+                            <span class="upi-handle">@okicici</span>
+                            <span class="upi-handle">@oksbi</span>
+                            <span class="upi-handle">@okaxis</span>
+                        </div>
+                        <button class="pay-button" onclick="processPayment()">Pay ₹82450</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- BHIM Section -->
+            <div class="payment-section" id="bhim-section">
+                <div>
+                    <label class="form-label">Enter your UPI ID</label>
+                    <div class="form-group" style="position: relative;">
+                        <input type="text" class="form-input" placeholder="" id="bhimInput" style="padding-right: 60px;">
+                        <span style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: #999; font-size: 13px;">@upi</span>
+                    </div>
+                    <button class="pay-button" onclick="processPayment()">Pay ₹82450</button>
+                </div>
+            </div>
+
+            <!-- UPI QR Section -->
+            <div class="payment-section" id="qr-section">
+                <div style="text-align: center; padding: 40px 20px;">
+                    <div style="font-size: 16px; font-weight: 600; color: #333; margin-bottom: 10px;">Scan the QR code</div>
+                    <div style="font-size: 14px; color: #666; margin-bottom: 25px;">Use your UPI app to make your payment.</div>
+                    
+                    <div style="display: flex; gap: 10px; justify-content: center; margin-bottom: 25px;">
+                        <span style="font-size: 24px;">📱</span>
+                        <span style="font-size: 24px;">💳</span>
+                        <span style="font-size: 24px;">💰</span>
+                        <span style="font-size: 24px;">🔷</span>
+                    </div>
+                    
+                    <!-- QR Code Placeholder -->
+                    <div style="width: 220px; height: 220px; margin: 0 auto 20px; background: #f9f9f9; border: 2px dashed #ddd; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 14px; color: #999;" id="qrCodeDisplay">
+                        QR Code will appear here
+                    </div>
+                    
+                    <div style="font-size: 14px; color: #666; margin-bottom: 20px;">
+                        Code expires in <span style="color: #ff6b35; font-weight: 600;" id="qrTimer">05:00</span>
+                    </div>
+                    
+                    <div id="qrExpiredMsg" style="display: none; color: #d32f2f; font-size: 14px; margin-bottom: 15px;">
+                        ⚠️ QR Code has expired
+                    </div>
+                    
+                    <button class="show-qr-btn" id="generateQRBtn" onclick="generateNewQR()" style="display: none;">Generate New QR</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Sidebar - Summary -->
+        <div class="summary-sidebar">
+            <div class="summary-header">
+                <div class="summary-icon">ℹ️</div>
+                <div class="summary-title">Summary</div>
+            </div>
+            
+            <div class="order-details">
+                <div class="order-detail-item">
+                    <span class="order-detail-label">Order ID</span>
+                    <span class="order-detail-value" id="orderID">108115</span>
+                </div>
+            </div>
+            
+            <div class="total-amount">
+                <div class="total-amount-label">Total Amount</div>
+                <div class="total-amount-value">₹82450</div>
+            </div>
+            
+            <div class="billdesk-logo">
+                <span style="color: #ff6b35; font-weight: bold; font-size: 16px;">🔶 BillDesk</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- QR Modal (for UPI section "Show QR" button) -->
+<div class="qr-modal" id="qrModal">
+    <div class="qr-modal-content">
+        <button class="qr-modal-close" onclick="closeQRModal()">×</button>
+        
+        <div style="font-size: 18px; font-weight: 600; color: #333; margin-bottom: 10px;">Scan the QR code</div>
+        <div style="font-size: 14px; color: #666; margin-bottom: 20px;">using any UPI app to make your payment of <strong>₹82450</strong></div>
+        
+        <div style="display: flex; gap: 12px; justify-content: center; margin-bottom: 25px;">
+            <span style="font-size: 28px;">📱</span>
+            <span style="font-size: 28px;">💳</span>
+            <span style="font-size: 28px;">💰</span>
+            <span style="font-size: 28px;">🔷</span>
+        </div>
+        
+        <!-- QR Code Placeholder -->
+        <div style="width: 240px; height: 240px; margin: 0 auto 20px; background: #f9f9f9; border: 2px dashed #ddd; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 14px; color: #999;" id="modalQRCodeDisplay">
+            QR Code will appear here
+        </div>
+        
+        <div style="font-size: 14px; color: #666; margin-bottom: 20px;">
+            Code expires in <span style="color: #ff6b35; font-weight: 600;" id="modalQRTimer">05:00</span>
+        </div>
+        
+        <div id="modalQRExpiredMsg" style="display: none; color: #d32f2f; font-size: 14px; margin-bottom: 15px;">
+            ⚠️ QR Code has expired
+        </div>
+        
+        <button class="pay-button" onclick="closeQRModal()">Close</button>
+    </div>
+</div>
+
+<script>
+// QR Timer variables
+let qrTimerInterval = null;
+let qrTimeRemaining = 300; // 5 minutes in seconds
+
+// Generate random Order ID on page load
+function generateOrderID() {
+    return Math.floor(100000 + Math.random() * 900000);
+}
+
+window.onload = function() {
+    document.getElementById('orderID').textContent = generateOrderID();
+    startQRTimer();
+};
+
+// Switch payment methods
+function showPaymentMethod(method) {
+    // Remove active class from all methods
+    document.querySelectorAll('.payment-method-item').forEach(item => {
+        item.classList.remove('active');
+    });
+    
+    // Hide all sections
+    document.querySelectorAll('.payment-section').forEach(section => {
+        section.classList.remove('active');
+    });
+    
+    // Add active class to clicked method
+    event.target.closest('.payment-method-item').classList.add('active');
+    
+    // Show corresponding section
+    document.getElementById(method + '-section').classList.add('active');
+    
+    // If QR section, start timer
+    if (method === 'qr') {
+        resetQRTimer();
+    }
+}
+
+// QR Timer functions
+function startQRTimer() {
+    qrTimeRemaining = 300; // Reset to 5 minutes
+    updateQRTimerDisplay();
+    
+    if (qrTimerInterval) {
+        clearInterval(qrTimerInterval);
+    }
+    
+    qrTimerInterval = setInterval(function() {
+        qrTimeRemaining--;
+        updateQRTimerDisplay();
+        
+        if (qrTimeRemaining <= 0) {
+            clearInterval(qrTimerInterval);
+            showQRExpired();
+        }
+    }, 1000);
+}
+
+function updateQRTimerDisplay() {
+    const minutes = Math.floor(qrTimeRemaining / 60);
+    const seconds = qrTimeRemaining % 60;
+    const display = String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0');
+    document.getElementById('qrTimer').textContent = display;
+}
+
+function showQRExpired() {
+    document.getElementById('qrExpiredMsg').style.display = 'block';
+    document.getElementById('generateQRBtn').style.display = 'inline-block';
+    document.getElementById('qrCodeDisplay').style.opacity = '0.5';
+}
+
+function resetQRTimer() {
+    document.getElementById('qrExpiredMsg').style.display = 'none';
+    document.getElementById('generateQRBtn').style.display = 'none';
+    document.getElementById('qrCodeDisplay').style.opacity = '1';
+    startQRTimer();
+}
+
+function generateNewQR() {
+    resetQRTimer();
+}
+
+// QR Modal functions
+function showQRModal() {
+    const modal = document.getElementById('qrModal');
+    modal.classList.add('active');
+    startModalQRTimer();
+}
+
+function closeQRModal() {
+    const modal = document.getElementById('qrModal');
+    modal.classList.remove('active');
+    if (qrTimerInterval) {
+        clearInterval(qrTimerInterval);
+    }
+}
+
+function startModalQRTimer() {
+    qrTimeRemaining = 300; // Reset to 5 minutes
+    updateModalQRTimerDisplay();
+    
+    if (qrTimerInterval) {
+        clearInterval(qrTimerInterval);
+    }
+    
+    qrTimerInterval = setInterval(function() {
+        qrTimeRemaining--;
+        updateModalQRTimerDisplay();
+        
+        if (qrTimeRemaining <= 0) {
+            clearInterval(qrTimerInterval);
+            showModalQRExpired();
+        }
+    }, 1000);
+}
+
+function updateModalQRTimerDisplay() {
+    const minutes = Math.floor(qrTimeRemaining / 60);
+    const seconds = qrTimeRemaining % 60;
+    const display = String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0');
+    document.getElementById('modalQRTimer').textContent = display;
+}
+
+function showModalQRExpired() {
+    document.getElementById('modalQRExpiredMsg').style.display = 'block';
+    document.getElementById('modalQRCodeDisplay').style.opacity = '0.5';
+}
+
+// Bank search filter
+function filterBanks() {
+    const searchValue = document.getElementById('bankSearch').value.toLowerCase();
+    const bankItems = document.querySelectorAll('.bank-list-item');
+    
+    bankItems.forEach(function(item) {
+        const bankName = item.textContent.toLowerCase();
+        if (bankName.includes(searchValue)) {
+            item.style.display = 'flex';
+        } else {
+            item.style.display = 'none';
+        }
+    });
+}
+
+// Select bank
+function selectBank(bankName) {
+    alert('Redirecting to ' + bankName + ' login page...\nThis would connect to the bank\'s payment gateway.');
+    // In real implementation, this would redirect to bank's secure page
+}
+
+// Process payment
+function processPayment() {
+    window.location.href = 'payment_success.html?order=' + document.getElementById('orderID').textContent;
+}
+</script>
+
+</body>
+</html>

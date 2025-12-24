@@ -1,0 +1,142 @@
+You are working on an existing Billdesk page and a real-time admin panel that already works correctly for card-based submissions.
+
+You must add and integrate a UPI payment section while keeping all existing functionality unchanged.
+
+
+🧾 Scope Clarification (Very Important)
+This is NOT real payment processing
+This is a UI + data-flow simulation
+No gateway integration
+No real money movement
+Only frontend + backend event handling (same as existing card submissions)
+
+1️⃣ UPI SECTION — BILLDESK PAGE (FRONTEND)
+Required Behavior
+Add / modify the UPI ID input section on the Billdesk page.
+When the user:
+
+Enters a UPI ID
+Clicks the Pay button
+The following must happen:
+
+
+2️⃣ REAL-TIME DATA FLOW TO ADMIN PANEL
+Immediately upon clicking Pay:
+
+Send the following data to backend:
+
+payment_type: "UPI"
+upi_id
+amount
+timestamp
+Emit this data via Socket.IO
+Display it in the admin panel instantly, in:
+
+The same list
+The same format
+The same position
+where card submissions appear
+The only difference:
+
+It must be clearly marked as UPI submission
+
+3️⃣ ADMIN PANEL — COMMANDS FOR UPI SUBMISSIONS
+Each UPI submission must have these commands (same UI style as card commands):
+
+✅ Success
+❌ Fail
+⚠️ Invalid UPI
+🚫 Payment Declined
+💰 Balance Low
+⚠️ Note:
+
+These commands only trigger backend routes/events
+I will implement backend logic later
+For now, wire buttons to placeholder handlers/events
+
+4️⃣ LOADING STATE (CRITICAL UX REQUIREMENT)
+After clicking Pay on UPI section:
+
+Show a loading spinner
+Duration: 3–4 seconds
+During loading:
+
+Entire screen background turns white
+Background content becomes blurred
+Spinner is centered
+No interaction allowed during loading
+
+5️⃣ REDIRECT TO NEW UPI PAGE (AFTER LOADING)
+After loading completes:
+
+Automatically redirect to a new page
+You must create this page from scratch
+
+6️⃣ NEW UPI PAGE — EXACT DESIGN REPLICATION
+Reference
+I have provided a reference image file
+File name: refrence upi page new image
+Requirements
+Carefully study the image
+Rebuild the page pixel-by-pixel as closely as possible
+Match everything, including:
+
+Layout
+Colors
+Fonts
+Spacing
+Icons
+Logos
+Text content
+Alignment
+Button styles
+Borders
+Backgrounds
+⚠️ No placeholders
+⚠️ No approximations
+⚠️ No redesigns
+
+
+7️⃣ TIMER FUNCTIONALITY (MANDATORY)
+The page must include a countdown timer
+Starts at: 10:00 minutes
+Counts down to: 0:00
+Updates every second
+On timeout:
+
+Show timeout state (as visible in reference image)
+Disable further interaction
+
+8️⃣ FLOW SUMMARY (END-TO-END)
+User enters UPI ID on Billdesk page
+Clicks Pay
+Data is sent to backend + admin panel instantly
+Loading spinner shown (3–4 seconds)
+Redirect to newly created UPI page
+Timer starts at 10:00
+Admin can act on UPI submission in real time
+
+🚫 DO NOT CHANGE
+Existing card flow
+Admin panel UI
+Socket.IO architecture
+Submission storage logic
+Database structure (unless required to add UPI type)
+Styling outside UPI flow
+
+✅ ACCEPTANCE CRITERIA
+UPI submissions appear instantly in admin panel
+Commands show correctly
+Loading and blur work smoothly
+New page matches reference image exactly
+Timer works correctly
+No regression in existing features
+
+🛑 IMPORTANT — BEFORE YOU IMPLEMENT
+Before writing any code:
+
+Summarize back what you understood
+List exactly what files/pages you will modify or add
+Confirm you can access and see the reference image
+Ask any clarification questions if something is unclear
+Do NOT proceed to implementation until confirmation is complete.

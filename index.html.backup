@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=1024" />
+    <title>SMS Varanasi - Online Fee Deposit</title>
+    <meta name="description" content="School of Management Sciences, Varanasi - Online Payment Portal" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <!-- Main Container -->
+    <div class="page-wrapper">
+      <!-- Header Section -->
+      <header class="header">
+        <div class="header-content">
+          <div class="logo-section">
+            <img src="logo.png" alt="SMS Varanasi Logo" class="logo" />
+          </div>
+          <div class="banner-section">
+            <img src="banner.png" alt="Online Payment" class="banner" />
+          </div>
+        </div>
+      </header>
+
+      <!-- Navigation Bar -->
+      <nav class="navbar">
+        <div class="nav-left">
+          <a href="#" class="home-link">
+            <svg class="home-icon" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+            </svg>
+            <span>HOME</span>
+          </a>
+        </div>
+        <div class="nav-right">
+          <span class="contact-text">CONTACT US</span>
+          <svg class="contact-icon phone-icon" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/>
+          </svg>
+          <svg class="contact-icon email-icon" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+          </svg>
+        </div>
+      </nav>
+
+      <!-- Main Content -->
+      <main class="main-content">
+        <h1 class="page-title">ONLINE FEE DEPOSIT</h1>
+
+        <!-- Button Grid -->
+        <div class="button-grid">
+          <button class="fee-button green-btn">
+            <span class="btn-text">PLAGIARISM FEE<br>DEPOSIT</span>
+          </button>
+          <button class="fee-button gray-btn">
+            <span class="btn-text">EXAMINATION FEE<br>LOGIN</span>
+          </button>
+          <button class="fee-button light-blue-btn">
+            <span class="btn-text">NEW ADMISSION<br>FEE DEPOSIT</span>
+          </button>
+          <button class="fee-button dark-blue-btn">
+            <span class="btn-text">EXISTING STUDENT<br>SEMESTER FEE LOGIN</span>
+          </button>
+          <button class="fee-button light-blue-btn">
+            <span class="btn-text">NEW ADMISSION<br>HOSTEL FEE</span>
+          </button>
+          <button class="fee-button dark-blue-btn">
+            <span class="btn-text">EXISTING STUDENT<br>HOSTEL FEE</span>
+          </button>
+        </div>
+
+        <!-- Important Note Section -->
+        <section class="info-section">
+          <h2 class="section-title red-title">IMPORTANT NOTE:</h2>
+          <ol class="info-list">
+            <li>EXISTING STUDENT CAN DEPOSIT THEIR <span class="highlight-red">EXAM FEE ONLINE</span> USING THEIR <span class="highlight-black">COMPLETE ROLL NUMBER (i.e. B/10/021 etc. )</span> AND PASSWORD AGAIN THE SAME ROLL NUMBER.</li>
+            <li>EXISTING STUDENT CAN DEPOSIT THEIR <span class="highlight-red">SEMESTER/ YEAR FEE ONLINE</span>. THEY HAVE TO ENTER THEIR <span class="highlight-black">COMPLETE ROLL NUMBER (i.e. B/10/021 etc. )</span> AND PASSWORD (AS ENROLLMENT NUMBER which is given in your previous semester/ year original receipt issued by SMS Varanasi Fee Counter)</li>
+            <li>NEW ADMISSION CAN DEPOSIT THEIR FEE ONLINE BY ENTERING <span class="highlight-black">FORM NUMBER</span> ISSUED BY SMS VARANASI/GIVEN INTO THE ALREADY FILLED -UP FORM.</li>
+            <li>WHEN FEE IS DEPOSITED THROUGH ONLINE MODE, GET THE PRINT OF PROVISIONAL FEE RECEIPT FROM THE WEBSITE AND SHOW IT TO SMS VARANASI FEE COUNTER ONLY THEN ORIGINAL FEE RECEIPT WILL BE ISSUED TO THE STUDENT.</li>
+          </ol>
+        </section>
+
+        <!-- Disclaimer Section -->
+        <section class="info-section">
+          <h2 class="section-title">DISCLAIMER</h2>
+          <p class="info-text">This site is designed, developed and content are provided by SMS VARANASI. For any further information, please contact School of Management Sciences, Varanasi (SMS VARANASI).</p>
+        </section>
+
+        <!-- Terms and Conditions Section -->
+        <section class="info-section">
+          <h2 class="section-title">TERMS AND CONDITIONS</h2>
+          <p class="info-text">Terms and conditions as per affiliating and statutory body of the institution. For more details see our website <span class="highlight-black">http://www.smsvaranasi.com</span></p>
+          <p class="info-text">The Student/Customer have to bear Payment Gateway charges + Taxes, as per the following details:</p>
+          <p class="info-text">Debit Card Charges: 1% :: Credit Card Charges : 1%</p>
+          <p class="info-text">Net Banking : Rs. 25 :: UPI and Rupay Debit Card :: NIL</p>
+        </section>
+
+        <!-- Privacy Policy Section -->
+        <section class="info-section">
+          <h2 class="section-title">PRIVACY POLICY</h2>
+          <p class="info-text">SMS VARANASI website considers the protection of your personal information a top priority when you use services and access the website. The website will take all necessary measures to safeguard your privacy. If you decide to access the website, your visit and any dispute over privacy is subject to this Privacy Policy and Our Terms and Conditions of use. Our Policy regarding the collection, use and disclosure, if any, of personal information is very strict and we adhere to the best of practices to guard your personal information with care.</p>
+        </section>
+
+        <!-- Refund/Cancellation Policy Section -->
+        <section class="info-section">
+          <h2 class="section-title">REFUND/ CANCELLATION POLICY</h2>
+          <p class="info-text">If the payment is not successful, the amount will be reverted back to the candidate's account within 5-8 working days time. Online application once approved, the fund cannot be refunded.</p>
+        </section>
+
+        <!-- List of Services Section -->
+        <section class="info-section">
+          <h2 class="section-title">LIST OF SERVICES OFFERED AND THEIR PRICING</h2>
+          <p class="info-text">We are offering different courses in Management and Computer through BBA, BCA, BCOM, MBA, MCA and PGDM courses. For the details about their fees etc. kindly visit our website <span class="highlight-black">https://www.smsvaranasi.com</span></p>
+        </section>
+
+        <!-- Bottom Button Grid -->
+        <div class="button-grid bottom-buttons">
+          <button class="fee-button green-btn">
+            <span class="btn-text">PLAGIARISM FEE<br>DEPOSIT</span>
+          </button>
+          <button class="fee-button light-blue-btn">
+            <span class="btn-text">NEW ADMISSION<br>FEE DEPOSIT</span>
+          </button>
+          <button class="fee-button dark-blue-btn">
+            <span class="btn-text">EXISTING STUDENT<br>SEMESTER FEE LOGIN</span>
+          </button>
+          <button class="fee-button light-blue-btn">
+            <span class="btn-text">NEW ADMISSION<br>HOSTEL FEE</span>
+          </button>
+          <button class="fee-button dark-blue-btn">
+            <span class="btn-text">EXISTING STUDENT<br>HOSTEL FEE</span>
+          </button>
+        </div>
+      </main>
+
+      <!-- Footer -->
+      <footer class="footer">
+        <p>Designed & Developed by <strong>School of Management Sciences, Varanasi</strong></p>
+      </footer>
+    </div>
+
+    <script src="script.js" defer></script>
+  </body>
+</html>

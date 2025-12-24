@@ -1,0 +1,18 @@
+<svg width="400" height="120" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="400" height="120" fill="#ffffff"/>
+  
+  <!-- Estd. 1995 -->
+  <text x="10" y="18" font-family="Arial" font-size="12" fill="#cc0000" font-weight="bold">Estd.1995</text>
+  
+  <!-- SMS Logo -->
+  <text x="10" y="70" font-family="Arial, sans-serif" font-size="68" font-weight="bold" fill="#cc0000">SMS</text>
+  
+  <!-- VARANASI -->
+  <text x="10" y="95" font-family="Arial" font-size="16" fill="#cc0000" font-weight="bold" letter-spacing="3">VARANASI</text>
+  
+  <!-- School of Management Sciences -->
+  <text x="220" y="48" font-family="Arial" font-size="20" fill="#cc0000" font-weight="bold">School of</text>
+  <text x="220" y="72" font-family="Arial" font-size="20" fill="#cc0000" font-weight="bold">Management</text>
+  <text x="220" y="96" font-family="Arial" font-size="20" fill="#cc0000" font-weight="bold">Sciences</text>
+</svg>

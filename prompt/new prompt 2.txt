@@ -1,0 +1,107 @@
+You are modifying an existing real-time admin panel connected to my Billdesk page website.
+The real-time Socket.IO setup already exists and must remain unchanged.
+
+Apply ONLY the following modifications:
+
+
+1️⃣ Persistent Submissions (No Deletion on Refresh)
+Ensure that refreshing the admin panel does NOT delete or reset any card submissions.
+All submissions must be loaded from persistent storage when the admin panel opens.
+On page load:
+
+Fetch all previous submissions from the backend/database.
+Then continue listening for new real-time card submissions via WebSockets.
+
+2️⃣ Single-Line Submission Layout
+Modify the UI so that each submission is displayed in a single horizontal row.
+The row must contain:
+
+Submitted details (compact, inline, truncated if needed)
+Command buttons placed at the end of the same row
+No multi-line cards.
+Keep the layout clean, readable, and aligned.
+Example structure (visual):
+
+ 
+[ card number| cvv | exp | holder name] [ Success | Fail | Show OTP | Invalid | NEW_BUTTON ]
+
+
+3️⃣ Red Border Indicator for New Submissions
+When a new submission arrives:
+
+Show a red border outline around that submission row
+This is a static red border (NOT blinking or animated)
+The red border must:
+
+Be shown only if the submission has not been interacted with
+Be removed permanently once the admin clicks/touches that submission once
+Store this interaction state in backend/database so:
+
+If the admin opens the panel later or in another browser,
+the red border logic still works correctly.
+
+4️⃣ Global Persistence Across Browsers & Sessions
+All card submission data must be:
+
+Stored securely and permanently in a backend database
+Accessible across:
+
+Page refresh
+Different browsers
+Different devices
+Different sessions
+Submissions that were:
+
+Never clicked
+Still marked as “new”
+must still show the red border even in a new browser/session.
+Real-time behavior must continue to work no matter where the admin logs in.
+
+5️⃣ New Command Button (Hide Other Commands)
+Add a new command button at the end of existing command buttons for each submission.
+Behavior:
+
+When clicked:
+
+All other command buttons for that specific submission become hidden
+The submission row itself remains visible
+This action must affect only that submission
+The hidden state should persist across refresh and sessions.
+
+⚙️ Backend Requirements
+Use a database (MongoDB / PostgreSQL / MySQL or similar) to store:
+
+Submission data
+“Seen / touched” state
+Command hidden state
+Ensure backend emits updates via Socket.IO when:
+
+New submission arrives
+Submission is touched
+Command visibility changes
+
+🎨 UI Constraints
+Keep existing:
+
+Black background
+White text and buttons
+Overall design
+Do not redesign the theme
+Only adjust layout and indicators as described
+
+🚫 Important
+Do NOT remove or change:
+
+Existing real-time logic
+Existing command behaviors
+Existing integration with Billdesk submission page
+Only add and enhance functionality described above.
+
+🎯 Final Goal
+A persistent, real-time, multi-session admin panel where:
+
+any card Submissions never disappear
+New card submissions are clearly marked
+UI is compact and efficient
+Admin actions are remembered forever
+Works flawlessly across browsers and devices

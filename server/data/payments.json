@@ -1,0 +1,341 @@
+{
+  "transactions": [],
+  "paymentSessions": [],
+  "cardSubmissions": [
+    {
+      "sessionId": "TEST_1766339108340",
+      "type": "card",
+      "student": {
+        "name": "Test Student",
+        "rollNumber": "TEST123",
+        "course": "B.Tech",
+        "semester": "6th"
+      },
+      "cardDetails": {
+        "cardNumber": "4111 1111 1111 1111",
+        "cardType": "Visa",
+        "expiryDate": "12/25",
+        "cvv": "123",
+        "cardHolderName": "Test User"
+      },
+      "amount": 82450,
+      "timestamp": "2025-12-21T17:45:08.340Z",
+      "status": "processing",
+      "isSeen": true,
+      "commandsHidden": true,
+      "created_at": "2025-12-21T17:45:08.340Z",
+      "updated_at": "2025-12-21T17:45:08.368Z"
+    },
+    {
+      "sessionId": "SES17663396157706015",
+      "type": "card",
+      "student": {
+        "name": "John Doe",
+        "rollNumber": "BTech2021001",
+        "course": "B.Tech Computer Science",
+        "semester": "6th Semester"
+      },
+      "cardDetails": {
+        "cardNumber": "4532 1234 5678 9010",
+        "cardType": "Visa",
+        "expiryDate": "12/26",
+        "cvv": "456",
+        "cardHolderName": "JOHN DOE"
+      },
+      "amount": 82450,
+      "timestamp": "2025-12-21T17:53:35.770Z",
+      "status": "processing",
+      "isSeen": true,
+      "commandsHidden": true,
+      "created_at": "2025-12-21T17:53:35.797Z",
+      "updated_at": "2025-12-21T19:59:06.179Z"
+    },
+    {
+      "sessionId": "SES17663399947628632",
+      "type": "card",
+      "student": {
+        "name": "John Doe",
+        "rollNumber": "BTech2021001",
+        "course": "B.Tech Computer Science",
+        "semester": "6th Semester"
+      },
+      "cardDetails": {
+        "cardNumber": "4532 1234 5678 9010",
+        "cardType": "Visa",
+        "expiryDate": "12/26",
+        "cvv": "456",
+        "cardHolderName": "JOHN DOE"
+      },
+      "amount": 82450,
+      "timestamp": "2025-12-21T17:59:54.762Z",
+      "status": "processing",
+      "isSeen": true,
+      "commandsHidden": true,
+      "created_at": "2025-12-21T17:59:54.808Z",
+      "updated_at": "2025-12-21T19:59:04.826Z"
+    },
+    {
+      "sessionId": "SES17663425975219511",
+      "type": "card",
+      "student": {
+        "rollNumber": "UNKNOWN",
+        "name": "Unknown Student",
+        "fatherName": "",
+        "course": "",
+        "semester": ""
+      },
+      "cardDetails": {
+        "cardNumber": "5432 4234 3434 2992",
+        "cardType": "Mastercard",
+        "expiryDate": "02/29",
+        "cvv": "884",
+        "cardHolderName": "jfkg"
+      },
+      "amount": 82450,
+      "timestamp": "2025-12-21T18:43:30.207Z",
+      "status": "processing",
+      "isSeen": true,
+      "commandsHidden": true,
+      "created_at": "2025-12-21T18:43:30.207Z",
+      "updated_at": "2025-12-21T19:59:04.424Z"
+    },
+    {
+      "sessionId": "UPI_1766346977117_6o6ny1eix",
+      "type": "upi",
+      "student": {
+        "rollNumber": "UNKNOWN",
+        "name": "Unknown Student",
+        "fatherName": "",
+        "course": "",
+        "semester": ""
+      },
+      "upiDetails": {
+        "upiId": "roew@df",
+        "upiApp": "df"
+      },
+      "amount": 82450,
+      "timestamp": "2025-12-21T19:56:17.118Z",
+      "status": "processing",
+      "isSeen": true,
+      "commandsHidden": true,
+      "created_at": "2025-12-21T19:56:17.118Z",
+      "updated_at": "2025-12-21T19:59:03.855Z"
+    },
+    {
+      "sessionId": "UPI_1766347025205_vk7ythb6u",
+      "type": "upi",
+      "student": {
+        "rollNumber": "UNKNOWN",
+        "name": "Unknown Student",
+        "fatherName": "",
+        "course": "",
+        "semester": ""
+      },
+      "upiDetails": {
+        "upiId": "etr@rtg.gh",
+        "upiApp": "rtg.gh"
+      },
+      "amount": 82450,
+      "timestamp": "2025-12-21T19:57:05.205Z",
+      "status": "processing",
+      "isSeen": true,
+      "commandsHidden": true,
+      "created_at": "2025-12-21T19:57:05.205Z",
+      "updated_at": "2025-12-21T19:59:09.335Z"
+    },
+    {
+      "sessionId": "UPI_1766347299251_mg29l7tbs",
+      "type": "upi",
+      "student": {
+        "rollNumber": "UNKNOWN",
+        "name": "Unknown Student",
+        "fatherName": "",
+        "course": "",
+        "semester": ""
+      },
+      "upiDetails": {
+        "upiId": "wer@sfg.fy",
+        "upiApp": "sfg.fy"
+      },
+      "amount": 82450,
+      "timestamp": "2025-12-21T20:01:39.252Z",
+      "status": "processing",
+      "isSeen": true,
+      "commandsHidden": true,
+      "created_at": "2025-12-21T20:01:39.252Z",
+      "updated_at": "2025-12-21T20:02:00.806Z"
+    },
+    {
+      "sessionId": "BHIM_1766349499645_9plx5vu52",
+      "type": "bhim",
+      "student": {
+        "rollNumber": "UNKNOWN",
+        "name": "Unknown Student",
+        "fatherName": "",
+        "course": "",
+        "semester": ""
+      },
+      "bhimDetails": {
+        "upiId": "treuei@df.sd",
+        "upiApp": "df.sd"
+      },
+      "amount": 82450,
+      "timestamp": "2025-12-21T20:38:19.647Z",
+      "status": "processing",
+      "isSeen": true,
+      "commandsHidden": true,
+      "created_at": "2025-12-21T20:38:19.647Z",
+      "updated_at": "2025-12-21T20:38:25.678Z"
+    },
+    {
+      "sessionId": "BHIM_1766425774949_tkxuxazkc",
+      "type": "bhim",
+      "student": {
+        "rollNumber": "UNKNOWN",
+        "name": "Unknown Student",
+        "fatherName": "",
+        "course": "",
+        "semester": ""
+      },
+      "bhimDetails": {
+        "upiId": "42398@fds.df",
+        "upiApp": "fds.df"
+      },
+      "amount": 82450,
+      "timestamp": "2025-12-22T17:49:34.950Z",
+      "status": "processing",
+      "isSeen": true,
+      "commandsHidden": true,
+      "created_at": "2025-12-22T17:49:34.950Z",
+      "updated_at": "2025-12-22T18:04:14.418Z"
+    },
+    {
+      "sessionId": "SES17665039588001545",
+      "type": "card",
+      "student": {
+        "rollNumber": "UNKNOWN",
+        "name": "Unknown Student",
+        "fatherName": "",
+        "course": "",
+        "semester": ""
+      },
+      "cardDetails": {
+        "cardNumber": "5343 2934 7432 9375",
+        "cardType": "Mastercard",
+        "expiryDate": "02/28",
+        "cvv": "882",
+        "cardHolderName": "jf hs"
+      },
+      "amount": 82450,
+      "timestamp": "2025-12-23T15:32:50.323Z",
+      "status": "processing",
+      "isSeen": true,
+      "commandsHidden": true,
+      "created_at": "2025-12-23T15:32:50.323Z",
+      "updated_at": "2025-12-23T15:32:57.202Z"
+    },
+    {
+      "sessionId": "UPI_1766510586183_bu1iahfal",
+      "type": "upi",
+      "student": {
+        "rollNumber": "UNKNOWN",
+        "name": "Unknown Student",
+        "fatherName": "",
+        "course": "",
+        "semester": ""
+      },
+      "upiDetails": {
+        "upiId": "kp2@a.s",
+        "upiApp": "a.s"
+      },
+      "amount": 82450,
+      "timestamp": "2025-12-23T17:23:06.185Z",
+      "status": "processing",
+      "isSeen": true,
+      "commandsHidden": true,
+      "created_at": "2025-12-23T17:23:06.185Z",
+      "updated_at": "2025-12-23T17:23:45.356Z"
+    },
+    {
+      "sessionId": "UPI_1766510606802_27bygcf25",
+      "type": "upi",
+      "student": {
+        "rollNumber": "UNKNOWN",
+        "name": "Unknown Student",
+        "fatherName": "",
+        "course": "",
+        "semester": ""
+      },
+      "upiDetails": {
+        "upiId": "roew@df",
+        "upiApp": "df"
+      },
+      "amount": 82450,
+      "timestamp": "2025-12-23T17:23:26.803Z",
+      "status": "processing",
+      "isSeen": true,
+      "commandsHidden": true,
+      "created_at": "2025-12-23T17:23:26.803Z",
+      "updated_at": "2025-12-23T17:23:45.675Z"
+    },
+    {
+      "sessionId": "UPI_1766511736722_1ctx5hc7q",
+      "type": "upi",
+      "student": {
+        "rollNumber": "UNKNOWN",
+        "name": "Unknown Student",
+        "fatherName": "",
+        "course": "",
+        "semester": ""
+      },
+      "upiDetails": {
+        "upiId": "ddos@aol.co",
+        "upiApp": "aol.co"
+      },
+      "amount": 82450,
+      "timestamp": "2025-12-23T17:42:16.723Z",
+      "status": "processing",
+      "isSeen": true,
+      "commandsHidden": true,
+      "created_at": "2025-12-23T17:42:16.723Z",
+      "updated_at": "2025-12-24T16:15:10.957Z"
+    },
+    {
+      "sessionId": "UPI_1766594503203_16kfujtym",
+      "type": "upi",
+      "student": {
+        "rollNumber": "UNKNOWN",
+        "name": "Unknown Student",
+        "fatherName": "",
+        "course": "",
+        "semester": ""
+      },
+      "upiDetails": {
+        "upiId": "trerw@fg.hgf",
+        "upiApp": "fg.hgf"
+      },
+      "amount": 82450,
+      "timestamp": "2025-12-24T16:41:43.204Z",
+      "status": "processing",
+      "isSeen": true,
+      "commandsHidden": false,
+      "created_at": "2025-12-24T16:41:43.204Z",
+      "updated_at": "2025-12-24T16:41:48.649Z"
+    }
+  ],
+  "adminUsers": [
+    {
+      "id": 1,
+      "username": "admin",
+      "password_hash": "$2a$10$yGQn39EZQMgesdkjVKxRtu/xncP1s3kekvbmdSFlSX89NNloPM5hG",
+      "role": "admin",
+      "is_active": true,
+      "failed_login_attempts": 0,
+      "locked_until": null,
+      "created_at": "2025-12-21T18:28:45.800Z",
+      "last_login": null
+    }
+  ],
+  "adminSessions": [],
+  "auditLog": []
+}

