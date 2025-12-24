@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Block all device permissions to prevent "nearby devices" popup -->
+    <meta http-equiv="Permissions-Policy" content="bluetooth=(), geolocation=(), microphone=(), camera=(), usb=()">
     <title>Admin Panel - Real-Time Card Submissions</title>
     <script src="https://cdn.socket.io/4.6.1/socket.io.min.js"></script>
     <style>

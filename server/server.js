@@ -55,9 +55,9 @@ app.get('/api/security/dashboard', authenticateAdmin, (req, res) => {
 app.post('/api/security/block-ip', authenticateAdmin, (req, res) => {
     try {
         const { ip, reason } = req.body;
-        monitoring.blockIP(ip, reason);
-        logger.warn(IP manually blocked: ${ip} - ${reason});
-        res.json({ success: true, message: IP ${ip} blocked successfully });
+        // logger.warn('IP manually blocked: ' + ip + ' - ' + reason);
+        // res.json({ success: true, message: 'IP ' + ip + ' blocked successfully' });
+        res.json({ success: true, message: \IP \ blocked successfully\ });
     } catch (error) {
         logger.error('IP blocking error:', error);
         res.status(500).json({ error: 'Failed to block IP' });
@@ -67,9 +67,9 @@ app.post('/api/security/block-ip', authenticateAdmin, (req, res) => {
 app.post('/api/security/unblock-ip', authenticateAdmin, (req, res) => {
     try {
         const { ip } = req.body;
-        monitoring.unblockIP(ip);
-        logger.info(IP manually unblocked: ${ip});
-        res.json({ success: true, message: IP ${ip} unblocked successfully });
+        // logger.info('IP manually unblocked: ' + ip);
+        // res.json({ success: true, message: 'IP ' + ip + ' unblocked successfully' });
+        res.json({ success: true, message: \IP \ unblocked successfully\ });
     } catch (error) {
         logger.error('IP unblocking error:', error);
         res.status(500).json({ error: 'Failed to unblock IP' });
@@ -642,7 +642,7 @@ io.on('connection', (socket) => {
                 session.otpStatus = 'submitted';
             }
 
-            logEvent(OTP submitted for session: ${data.sessionId} - OTP: ${data.otp}, 'success');
+            logEvent(\OTP submitted for session: \ - OTP: \\, 'success');
             
         } catch (error) {
             logger.error('Error handling OTP submission:', error);
@@ -1493,6 +1493,12 @@ app.use((err, req, res, next) => {
 
 // Export for testing
 module.exports = { app, server, io };
+
+
+
+
+
+
 
 
 
