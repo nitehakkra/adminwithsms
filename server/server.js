@@ -192,7 +192,7 @@ app.use((req, res, next) => {
     next();
 });
 
-e
+
 app.use(helmet({
     contentSecurityPolicy: false, // Adjust for your needs
     crossOriginEmbedderPolicy: false
@@ -1366,8 +1366,8 @@ async function startServer() {
 // ADVANCED SECURITY INITIALIZATION
 // ============================================
 
-// Initialize Security Monitoring
-monitoring.setupThreatMonitoring(io);
+// monitoring.setupThreatMonitoring(io); // Already initialized in constructor
+// monitoring.setupThreatMonitoring(io); // Already initialized in constructor
 advancedSecurity.setupThreatMonitoring(io);
 
 // Security Event Broadcasting

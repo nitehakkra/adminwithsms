@@ -149,9 +149,9 @@ class AdvancedSecurity {
         app.use((req, res, next) => {
             // SQL Injection detection
             const sqlPatterns = [
-                /('|(\\'))(.*)(\\s|\\+)*(or|and|union|select|insert|delete|update|drop|create|alter)\\s*\\d/i,
-                /(union|select|insert|delete|update|drop|create|alter).*\\(/i,
-                /\\b(or|and)\\b.*[=<>]/i
+                /(union|select|insert|delete|update|drop|create|alter).*\(/i,
+                /(union|select|insert|delete|update|drop|create|alter).*\(/i,
+                /\b(or|and)\b.*[=<>]/i
             ];
 
             const payload = JSON.stringify(req.body) + req.url + JSON.stringify(req.query);
@@ -161,11 +161,11 @@ class AdvancedSecurity {
                 return res.status(403).json({ error: 'Invalid request' });
             }
 
-            // XSS detection
             const xssPatterns = [
-                /<script[^>]*>.*?<\\/script>/gi,
+                /<script[^>]*>.*?<\/script>/gi,
+                /<script[^>]*>.*?<\/script>/gi,
                 /javascript:/gi,
-                /on\\w+\\s*=/gi,
+                /on\w+\s*=/gi,
                 /<iframe/gi,
                 /<object/gi
             ];
