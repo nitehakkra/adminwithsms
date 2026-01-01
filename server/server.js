@@ -155,7 +155,7 @@ app.use(helmet({
 // 6. Advanced Rate Limiting & DDoS Protection
 app.use('/api/', ddosProtection.aggressive);
 app.use('/admin/', ddosProtection.standard);
-app.use('/', ddosProtection.reputation);
+// app.use('/', ddosProtection.reputation); // DISABLED: Was blocking all routes including root
 
 // 7. Social Engineering & Bot Protection
 app.use(socialEngineering.reconnaissance);
