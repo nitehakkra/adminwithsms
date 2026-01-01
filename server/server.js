@@ -123,7 +123,7 @@ const ddosProtection = advancedSecurity.createDDoSProtection();
 const socialEngineering = advancedSecurity.createSocialEngineeringProtection();
 
 // 4. Real-time Monitoring & Intrusion Detection
-app.use(monitoring.analyzeRequest.bind(monitoring));
+// app.use(monitoring.analyzeRequest.bind(monitoring)); // DISABLED: Was causing 429 errors with rate limiting
 
 // 5. Advanced Security Headers
 app.use(helmet({
@@ -1528,6 +1528,7 @@ app.use((err, req, res, next) => {
 
 // Export for testing
 module.exports = { app, server, io };
+
 
 
 
