@@ -937,12 +937,14 @@ async function approvePayment(sessionId) {
     systemData.transactions.push(transaction);
     
     // Notify student via WebSocket (critical confirmation)
-    const studentSocket = Array.from(systemData.wsClients).find(s => s.id === session.socketId);
-    if (studentSocket) {
-        studentSocket.emit('paymentApproved', {
+    if (session.socketId) {
+        io.to(session.socketId).emit('paymentApproved', {
             transaction,
             message: 'Payment approved successfully'
         });
+        console.log('? Sent paymentApproved to socketId:', session.socketId);
+    } else {
+        console.error('? No socketId found for session:', sessionId);
     }
     
     // Broadcast to all admins via BOTH protocols (critical event)
@@ -962,12 +964,12 @@ async function rejectPayment(sessionId, reason) {
     systemData.stats.pendingPayments = Math.max(0, systemData.stats.pendingPayments - 1);
     
     // Notify student
-    const studentSocket = Array.from(systemData.wsClients).find(s => s.id === session.socketId);
-    if (studentSocket) {
-        studentSocket.emit('paymentRejected', {
+    if (session.socketId) {
+        io.to(session.socketId).emit('paymentRejected', {
             reason,
             message: 'Payment was rejected'
         });
+        console.log('? Sent paymentRejected to socketId:', session.socketId);
     }
     
     // Broadcast to admins
@@ -1528,6 +1530,8 @@ app.use((err, req, res, next) => {
 
 // Export for testing
 module.exports = { app, server, io };
+
+
 
 
 
