@@ -165,8 +165,13 @@ app.use('/admin/', ddosProtection.standard);
 // 8. Intrusion Detection System
 advancedSecurity.setupIntrusionDetection(app);
 
-// 9. IP Blocking Middleware
+// 9. IP Blocking Middleware (Disabled for static files)
 app.use((req, res, next) => {
+    // Skip IP blocking for static files (HTML, CSS, JS, images)
+    if (req.path.match(/\.(html|css|js|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|eot)$/i)) {
+        return next();
+    }
+    
     const clientIP = req.realIP || req.connection.remoteAddress;
     if (monitoring.isBlocked(clientIP)) {
         return res.status(403).json({ error: 'Access denied' });
@@ -1538,6 +1543,7 @@ app.use((err, req, res, next) => {
 
 // Export for testing
 module.exports = { app, server, io };
+
 
 
 
