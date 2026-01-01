@@ -134,7 +134,7 @@ app.use(helmet({
             scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https://cdn.tailwindcss.com", "https://cdn.socket.io"],
             scriptSrcAttr: ["'unsafe-inline'"],
             imgSrc: ["'self'", "data:", "https:"],
-            connectSrc: ["'self'", "https://api.ipify.org", "https://httpbin.org", "https://ipapi.co", "https://cdn.socket.io"],
+            connectSrc: ["'self'", "wss://authf0rens1c.onrender.com", "https://authf0rens1c.onrender.com", "https://api.ipify.org", "https://httpbin.org", "https://ipapi.co", "https://cdn.socket.io"],
             fontSrc: ["'self'"],
             objectSrc: ["'none'"],
             mediaSrc: ["'self'"],
@@ -1528,6 +1528,7 @@ app.use((err, req, res, next) => {
 
 // Export for testing
 module.exports = { app, server, io };
+
 
 
 

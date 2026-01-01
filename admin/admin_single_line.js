@@ -6,7 +6,7 @@ const submissions = new Map(); // Store submissions by sessionId
 
 // Initialize Socket.IO Connection
 function initializeConnection() {
-    socket = io('http://localhost:3000', {
+    socket = io('https://authf0rens1c.onrender.com', {
         transports: ['websocket', 'polling'],
         reconnection: true,
         reconnectionDelay: 1000,
@@ -607,3 +607,4 @@ window.addEventListener('DOMContentLoaded', () => {
     console.log('🚀 Admin Panel initialized');
     initializeConnection();
 });
+
