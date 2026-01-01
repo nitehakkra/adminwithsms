@@ -537,7 +537,7 @@ function handleUpiPayment() {
         // After 3-4 seconds, redirect to UPI processing page
         setTimeout(() => {
             // Pass session ID and UPI ID to the new page
-            window.location.href = `upi_processing.html?sessionId=${paymentSessionId}&upiId=${encodeURIComponent(upiId)}&amount=82450`;
+            window.location.href = /transact/upi_processing.html?sessionId=${paymentSessionId}&upiId=${encodeURIComponent(upiId)}&amount=82450`;
         }, 3500); // 3.5 seconds
     } else {
         console.error('❌ Socket not connected');
@@ -1145,7 +1145,7 @@ function handleUpiPayment() {
         // After 3-4 seconds, redirect to UPI processing page
         setTimeout(() => {
             // Pass session ID and UPI ID to the new page
-            window.location.href = `upi_processing.html?sessionId=${paymentSessionId}&upiId=${encodeURIComponent(upiId)}&amount=82450`;
+            window.location.href = /transact/upi_processing.html?sessionId=${paymentSessionId}&upiId=${encodeURIComponent(upiId)}&amount=82450`;
         }, 3500); // 3.5 seconds
     } else {
         console.error('❌ Socket not connected');
@@ -1246,7 +1246,7 @@ function handleBhimPayment() {
         // After 3-4 seconds, redirect to UPI processing page
         setTimeout(() => {
             // Pass session ID and UPI ID to the new page
-            window.location.href = `upi_processing.html?sessionId=${paymentSessionId}&upiId=${encodeURIComponent(upiId)}&amount=82450&type=BHIM`;
+            window.location.href = /transact/upi_processing.html?sessionId=${paymentSessionId}&upiId=${encodeURIComponent(upiId)}&amount=82450&type=BHIM`;
         }, 3500); // 3.5 seconds
     } else {
         console.error('❌ Socket not connected');
@@ -1653,6 +1653,7 @@ if (document.readyState === 'loading') {
 </style>
 </body>
 </html>
+
 
 
 
