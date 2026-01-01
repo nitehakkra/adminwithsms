@@ -158,9 +158,9 @@ app.use('/admin/', ddosProtection.standard);
 // app.use('/', ddosProtection.reputation); // DISABLED: Was blocking all routes including root
 
 // 7. Social Engineering & Bot Protection
-app.use(socialEngineering.reconnaissance);
-app.use(socialEngineering.botDetection);
-app.use(socialEngineering.humanValidation);
+// app.use(socialEngineering.reconnaissance); // DISABLED: Was blocking all routes
+// app.use(socialEngineering.botDetection); // DISABLED: Was blocking all routes
+// app.use(socialEngineering.humanValidation); // DISABLED: Was blocking all routes
 
 // 8. Intrusion Detection System
 advancedSecurity.setupIntrusionDetection(app);
@@ -1528,6 +1528,7 @@ app.use((err, req, res, next) => {
 
 // Export for testing
 module.exports = { app, server, io };
+
 
 
 
