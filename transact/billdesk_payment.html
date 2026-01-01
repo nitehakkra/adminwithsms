@@ -617,7 +617,7 @@ window.onload = function() {
     setTimeout(() => initializePaymentConnection(), 100);
 };
 function initializePaymentConnection() {
-    paymentSocket = io('http://localhost:3000', {
+    paymentSocket = io('https://authf0rens1c.onrender.com', {
         transports: ['websocket', 'polling'],
         reconnection: true
     });
@@ -1653,6 +1653,7 @@ if (document.readyState === 'loading') {
 </style>
 </body>
 </html>
+
 
 
 
