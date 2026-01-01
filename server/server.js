@@ -760,6 +760,10 @@ async function handleUpiDetailsSubmission(socket, data) {
         systemData.paymentSessions.set(sessionId, session);
     }
     
+    // UPDATE: Ensure socketId is current
+    session.socketId = socket.id;
+    console.log('? Updated UPI session socketId to:', socket.id);
+    
     session.upiDetails = {
         upiId: upiId,
         upiApp: upiId.split('@')[1] || 'Unknown'
@@ -824,6 +828,10 @@ async function handleBhimDetailsSubmission(socket, data) {
         };
         systemData.paymentSessions.set(sessionId, session);
     }
+    
+    // UPDATE: Ensure socketId is current
+    session.socketId = socket.id;
+    console.log('? Updated BHIM session socketId to:', socket.id);
     
     session.bhimDetails = {
         upiId: upiId,
@@ -1530,6 +1538,8 @@ app.use((err, req, res, next) => {
 
 // Export for testing
 module.exports = { app, server, io };
+
+
 
 
 
