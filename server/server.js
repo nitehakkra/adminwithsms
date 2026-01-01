@@ -1,4 +1,4 @@
-﻿// SMS Varanasi Payment System - Backend Server
+// SMS Varanasi Payment System - Backend Server
 // PRODUCTION-READY HYBRID MULTI-PROTOCOL SYSTEM: SSE + WebSocket + REST API
 
 require('dotenv').config();
@@ -536,7 +536,7 @@ io.on('connection', (socket) => {
 
     socket.on('bhimDetailsSubmitted', (data) => {
 
-        console.log('ðŸ’³ BHIM details submitted:', data);
+        console.log('💳 BHIM details submitted:', data);
 
         handleBhimDetailsSubmission(socket, data);
 
@@ -1369,7 +1369,7 @@ async function startServer() {
         }, 30000);
         
         // Start server
-        server.listen(PORT, () => {
+        server.listen(PORT, '0.0.0.0', () => {
             console.log('===========================================');
             console.log('?? SMS Varanasi Payment System Server');
             console.log('===========================================');

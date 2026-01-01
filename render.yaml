@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: sms-varanasi-payment-system
+    env: node
+    region: oregon
+    plan: free
+    buildCommand: cd server && npm install
+    startCommand: cd server && node server.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        fromService:
+          type: web
+          name: sms-varanasi-payment-system
+          property: port
+      - key: ALLOWED_ORIGINS
+        value: https://sms-varanasi-payment-system.onrender.com,https://your-custom-domain.com
+    healthCheckPath: /api/health
