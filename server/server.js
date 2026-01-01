@@ -1004,6 +1004,10 @@ function generateSessionId() {
 // API Routes
 
 // Health check
+app.get('/api/test-403', (req, res) => {
+    res.json({ message: 'IP blocking is disabled', timestamp: new Date().toISOString() });
+});
+
 app.get('/api/health', (req, res) => {
     res.json({
         status: 'running',
@@ -1538,6 +1542,7 @@ app.use((err, req, res, next) => {
 
 // Export for testing
 module.exports = { app, server, io };
+
 
 
 
