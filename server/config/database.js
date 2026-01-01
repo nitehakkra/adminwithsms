@@ -169,6 +169,17 @@ class Database {
         
         return Promise.resolve();
     }
+    async markCommandExecuted(sessionId) {
+        this.db.get('cardSubmissions')
+            .find({ sessionId })
+            .assign({ 
+                commandExecuted: true,
+                commandExecutedAt: new Date().toISOString(),
+                updated_at: new Date().toISOString()
+            })
+            .write();
+        return Promise.resolve();
+    }
     
     // ============================================
     // TRANSACTION METHODS
